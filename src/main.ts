@@ -5,6 +5,7 @@ import viteLogo from './assets/vite.svg'
 import javascriptLogo from './assets/javascript.svg'
 import tauriLogo from './assets/tauri.svg'
 import { setupCounter } from './counter'
+import { threeviewer } from './3dviewer'
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -39,7 +40,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 
     <p id="greet-msg"></p>
 
-    <iframe src="./src/3dviewer.html" width="800" height="640"><iframe>
+    <canvas id="threeCanvas"></canvas>
   </div>
 `
 
@@ -62,3 +63,4 @@ invoke('greet', { name: 'World' })
   .then((response) => console.log(response))
 
 setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+threeviewer(document.getElementById("threeCanvas"))
