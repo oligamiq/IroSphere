@@ -4,7 +4,7 @@ version = 3
 
 [[package]]
 name = "IroSphere"
-version = "0.0.0"
+version = "0.0.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -327,9 +327,9 @@ dependencies = [
 
 [[package]]
 name = "core-foundation-sys"
-version = "0.8.3"
+version = "0.8.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5827cebf4670468b8772dd191856768aedcb1b0278a04f989f7766351917b9dc"
+checksum = "e496a50fda8aacccc86d7529e2c1e0892dbd0f898a6b5645b5561b89c3210efa"
 
 [[package]]
 name = "core-graphics"
@@ -1572,16 +1572,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b7e5500299e16ebb147ae15a00a942af264cf3688f47923b8fc2cd5858f23ad3"
 
 [[package]]
-name = "open"
-version = "3.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2078c0039e6a54a0c42c28faa984e115fb4c2d5bf2208f77d1961002df8576f8"
-dependencies = [
- "pathdiff",
- "windows-sys 0.42.0",
-]
-
-[[package]]
 name = "openssl"
 version = "0.10.49"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1684,12 +1674,6 @@ name = "paste"
 version = "1.0.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9f746c4065a8fa3fe23974dd82f15431cc8d40779821001404d10d2e79ca7d79"
-
-[[package]]
-name = "pathdiff"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8835116a5c179084a830efb3adc117ab007512b535bc1a21c991d3b32a6b44dd"
 
 [[package]]
 name = "percent-encoding"
@@ -1893,9 +1877,9 @@ checksum = "dc375e1527247fe1a97d8b7156678dfe7c1af2fc075c9a4db3690ecd2a148068"
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.55"
+version = "1.0.56"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1d0dd4be24fcdcfeaa12a432d588dc59bbad6cad3510c67e74a2b6b2fc950564"
+checksum = "2b63bdb0cd06f1f4dedf69b254734f9b45af66e4a031e42a7480257d9898b435"
 dependencies = [
  "unicode-ident",
 ]
@@ -2569,11 +2553,9 @@ dependencies = [
  "minisign-verify",
  "objc",
  "once_cell",
- "open",
  "percent-encoding",
  "rand 0.8.5",
  "raw-window-handle",
- "regex",
  "rfd",
  "semver",
  "serde",
@@ -2628,7 +2610,6 @@ dependencies = [
  "png",
  "proc-macro2",
  "quote",
- "regex",
  "semver",
  "serde",
  "serde_json",
