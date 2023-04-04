@@ -6,6 +6,10 @@ import javascriptLogo from './assets/javascript.svg'
 import tauriLogo from './assets/tauri.svg'
 import { setupCounter } from './counter'
 import { threeviewer } from './3dviewer'
+import { img_load_init } from './img'
+import { registerShortcut } from './hotKey'
+
+registerShortcut();
 
 document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
   <div>
@@ -41,6 +45,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
     <p id="greet-msg"></p>
 
     <canvas id="threeCanvas"></canvas>
+    <img src="" id="file_img">
   </div>
 `
 
@@ -63,4 +68,7 @@ invoke('greet', { name: 'World' })
   .then((response) => console.log(response))
 
 setupCounter(document.querySelector<HTMLButtonElement>('#counter')!)
+
+img_load_init()
+
 threeviewer(document.getElementById("threeCanvas"))
