@@ -123,6 +123,12 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
                 if (implData) {
                     colorSphereMesh.visible = true
                     colorSphereMesh.material.color = new THREE.Color().setRGB(implData[0] / 255, implData[1] / 255, implData[2] / 255)
+
+                    let hsl = rgbToHsl({ r: implData[0] / 255, g: implData[1] / 255, b: implData[2] / 255 });
+                    const position = hslToPosition(hsl)
+                    colorSphereMesh.position.set(position.x, position.y, position.z)
+                    const rotation = positionToRotation(position)
+                    colorSphereMesh.rotation.set(rotation.x, rotation.y, rotation.z)
                 }
             }
             else colorSphereMesh.visible = false
@@ -318,3 +324,61 @@ function create_smooth_line_separate(height?: number | undefined, len?: number |
     smooth_func(Math.PI / 2)
     return smooth_line
 }
+
+function rgbToHsl(rgb: { r: number, g: number, b: number }) {
+    var hsl = { h: 0, s: 0, l: 0 };
+    var max = Math.max(rgb.r, Math.max(rgb.g, rgb.b));
+    var min = Math.min(rgb.r, Math.min(rgb.g, rgb.b));
+
+    hsl.l = (max + min) * 0.5;
+
+    if (max === min) {
+        hsl.h = 0;
+        hsl.s = 0;
+    } else {
+        if (max === rgb.r) {
+            hsl.h = 0.1666 * ((rgb.g - rgb.b) / (max - min));
+        } else if (max === rgb.g) {
+            hsl.h = 0.1666 * ((rgb.b - rgb.r) / (max - min)) + 0.3333;
+        } else {
+            hsl.h = 0.1666 * ((rgb.r - rgb.g) / (max - min)) + 0.6666;
+        }
+
+        if (hsl.h < 0) {
+            hsl.h += 1;
+        }
+
+        if (hsl.l < 0.5) {
+            hsl.s = (max - min) / (max + min);
+        } else {
+            hsl.s = (max - min) / (2 - max - min);
+        }
+    }
+    return hsl;
+}
+
+function hslToPosition(hsl: { h: number; s: number; l: number; }): THREE.Vector3 {
+    const position = new THREE.Vector3();
+
+    const angle = (hsl.h - 0.5) * 2.0 * -Math.PI + Math.PI / 2;
+    position.x = Math.cos(angle);
+    position.z = Math.sin(angle);
+
+    const tmpY = (hsl.l - 0.5) * 2.0;
+
+    position.multiplyScalar(Math.sqrt(1.0 - tmpY * tmpY) * position.length() * hsl.s);
+    position.y = tmpY;
+
+    return position;
+}
+
+function positionToRotation(position: THREE.Vector3): THREE.Quaternion {
+    let p = position.clone();
+    p.y = 0;
+    if (p.lengthSq() > Number.EPSILON) {
+        return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(p, new THREE.Vector3(), new THREE.Vector3(0, 1, 0)));
+    }
+    return new THREE.Quaternion();
+}
+
+
