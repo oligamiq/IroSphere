@@ -84,6 +84,11 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     axisGroup.add(axisMeshHorizontal)
     group.add(axisGroup)
 
+    var circle_geometry = new THREE.CircleGeometry(0.6, 32);
+    var circle_material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    var circle = new THREE.Mesh(circle_geometry, circle_material);
+    group.add(circle)
+
     async function f() {
         unlisten_resize = await appWindow.onResized(({ payload: size }) => {
             renderer.setSize(size.width / 2, size.height)
