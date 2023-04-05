@@ -1,8 +1,7 @@
 import { appWindow } from '@tauri-apps/api/window';
-import { TGALoader } from 'three/examples/jsm/loaders/TGALoader';
-import GridHorizontal from './assets/GridHorizontal.tga?url'
-import GridVertical from './assets/GridVertical.tga?url'
 import * as THREE from 'three';
+import { LineWeight } from './meshLine';
+
 
 // https://white-sesame.jp/archives/blog/3062
 
@@ -37,7 +36,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         const color = new THREE.Color().setHSL(hsl.h, hsl.s, hsl.l);
         const material = new THREE.MeshBasicMaterial({ color: color });
         const geometry = new THREE.SphereGeometry(size, divide[0], divide[1]); // サイズ, 分割数
-        const mesh = new THREE.Mesh(geometry, material);
+        const mesh = new THREE.Line(geometry, material);
         mesh.position.set(pos.x, pos.y, pos.z);
         if (!visible)
             mesh.visible = false;
@@ -61,18 +60,16 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     // 軸の表示
     const axisGroup = new THREE.Group();
     var axisMeshVertical = new THREE.Group();
-    var axisMeshHorizontal = new THREE.Group();
-    new TGALoader().load(GridVertical, texture => {
-        const axis_geometry = new THREE.PlaneGeometry(2, 2, 10, 10);
-        const axis_material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide, fog: false });
-        axis_material.alphaTest = 0.01
-        const axis_mesh = new THREE.Mesh(axis_geometry, axis_material);
-        const axis_mesh_cross = new THREE.Mesh(axis_geometry, axis_material);
-        axis_mesh_cross.rotation.y += Math.PI / 2;
-        axisMeshVertical.add(axis_mesh)
-        axisMeshVertical.add(axis_mesh_cross)
-    })
+    axisMeshVertical.add(create_smooth_line(64))
+    axisMeshVertical.add(create_smooth_line_separate(-0.5))
+    axisMeshVertical.add(create_smooth_line_separate(0.5))
+    axisMeshVertical.add(create_smooth_line_separate(-0.75, 0.05))
+    axisMeshVertical.add(create_smooth_line_separate(-0.25, 0.05))
+    axisMeshVertical.add(create_smooth_line_separate(0.25, 0.05))
+    axisMeshVertical.add(create_smooth_line_separate(0.75, 0.05))
     axisGroup.add(axisMeshVertical)
+
+    var axisMeshHorizontal = new THREE.Group();
     axisMeshHorizontal.add(create_rainbow_circle_frame(0.5, 64))
     axisMeshHorizontal.add(create_rainbow_circle_frame(1, 64))
     for (var i = 0; i < 8; ++i) {
@@ -81,6 +78,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         axisMeshHorizontal.add(create_rainbow_circle_frame_separate(0.25, 2 * Math.PI / 8 * i, 0.05))
     }
     axisGroup.add(axisMeshHorizontal)
+
     group.add(axisGroup)
 
     async function f() {
@@ -114,13 +112,13 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         function animate() {
             for (var i = 0; i < 1; ++i) {
                 if (key_down.w)
-                    x_speed += 0.005
-                if (key_down.a)
-                    y_speed += 0.005
-                if (key_down.s)
                     x_speed -= 0.005
-                if (key_down.d)
+                if (key_down.a)
                     y_speed -= 0.005
+                if (key_down.s)
+                    x_speed += 0.005
+                if (key_down.d)
+                    y_speed += 0.005
                 group.rotation.x += x_speed;
                 x_speed *= 0.85;
                 group.rotation.y += y_speed;
@@ -166,7 +164,7 @@ function positionToHSL(pos: THREE.Vector3) {
     return hsl;
 }
 
-function create_circle_frame_geometry(radius?: number | undefined, segments?: number | undefined, thetaStart?: number | undefined, thetaLength?: number | undefined): THREE.BufferGeometry {
+function create_circle_frame_geometry(radius?: number | undefined, segments?: number | undefined): THREE.BufferGeometry {
     if (!radius)
         radius = 2
     if (!segments)
@@ -184,61 +182,95 @@ function create_circle_frame_geometry(radius?: number | undefined, segments?: nu
     return geometry
 }
 
-function create_rainbow_circle_frame(radius?: number | undefined, segments?: number | undefined): THREE.Group {
+function create_rainbow_circle_frame(radius?: number | undefined, segments?: number | undefined, linewidth?: number | undefined): THREE.Group {
     if (!radius)
         radius = 1
     if (!segments)
         segments = 32
-    const circle_func = (k: number) => [Math.cos(2 * Math.PI / segments! * k) * radius!, 0, Math.sin(2 * Math.PI / segments! * k) * radius!]
+    if (!linewidth)
+        linewidth = 0.005
+    const circle_func = (k: number) => new THREE.Vector3(Math.cos(2 * Math.PI / segments! * k) * radius!, 0, Math.sin(2 * Math.PI / segments! * k) * radius!)
     const rainbow_circle_frame = new THREE.Group()
     for (var i = 0; i < segments; ++i) {
-        const circle_frame_geometry = new THREE.BufferGeometry()
         const color = new THREE.Color().setHSL(0.75 - (i + 0.5) / segments, radius, 0.5);
         const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
-        const vertices = new Float32Array(circle_func(i).concat(circle_func(i + 1)))
-        circle_frame_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
-        const circle_frame = new THREE.Line(circle_frame_geometry, circle_material);
+        const circle_frame = LineWeight(circle_func(i), circle_func(i + 1), linewidth, circle_material);
+
         rainbow_circle_frame.add(circle_frame)
     }
     return rainbow_circle_frame
 }
 
-function create_rainbow_circle_line(theta?: number | undefined, segments?: number | undefined): THREE.Group {
+function create_rainbow_circle_line(theta?: number | undefined, segments?: number | undefined, linewidth?: number | undefined): THREE.Group {
     if (!theta)
         theta = 0
     if (!segments)
         segments = 16
-    const circle_func = (k: number) => [Math.sin(theta! + Math.PI) / segments! * k, 0, Math.cos(theta! + Math.PI) / segments! * k]
+    if (!linewidth)
+        linewidth = 0.005
+    const circle_func = (k: number) => new THREE.Vector3(Math.sin(theta! + Math.PI) / segments! * k, 0, Math.cos(theta! + Math.PI) / segments! * k)
     const rainbow_circle_line = new THREE.Group()
     for (var i = 0; i < segments; ++i) {
-        const circle_line_geometry = new THREE.BufferGeometry()
         const color = new THREE.Color().setHSL(theta / Math.PI / 2, (i + 0.5) / segments, 0.5);
         const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
-        const vertices = new Float32Array(circle_func(i).concat(circle_func(i + 1)))
-        circle_line_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
-        const circle_line = new THREE.Line(circle_line_geometry, circle_material);
+        const circle_line = LineWeight(circle_func(i), circle_func(i + 1), linewidth, circle_material);
         rainbow_circle_line.add(circle_line)
     }
     return rainbow_circle_line
 }
 
 
-function create_rainbow_circle_frame_separate(radius?: number | undefined, theta?: number | undefined, len?: number | undefined): THREE.Line<THREE.BufferGeometry, THREE.LineBasicMaterial> {
+function create_rainbow_circle_frame_separate(radius?: number | undefined, theta?: number | undefined, len?: number | undefined, linewidth?: number | undefined): any {
     if (!radius)
         radius = 0.75
     if (!theta)
         theta = 0
     if (!len)
         len = 0.075
+    if (!linewidth)
+        linewidth = 0.005
     const separate_middle = [Math.sin(theta + Math.PI) * radius, Math.cos(theta + Math.PI) * radius]
-    const separate_down = [separate_middle[0] + Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] - Math.cos(Math.PI / 2 - theta) * len]
-    const separate_up = [separate_middle[0] - Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] + Math.cos(Math.PI / 2 - theta) * len]
-
-    const circle_line_geometry = new THREE.BufferGeometry()
+    const separate_down = new THREE.Vector3(separate_middle[0] + Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] - Math.cos(Math.PI / 2 - theta) * len)
+    const separate_up = new THREE.Vector3(separate_middle[0] - Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] + Math.cos(Math.PI / 2 - theta) * len)
     const color = new THREE.Color().setHSL(theta / Math.PI / 2, radius, 0.5);
     const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
-    const vertices = new Float32Array(separate_down.concat(separate_up))
-    circle_line_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
-    const circle_line = new THREE.Line(circle_line_geometry, circle_material);
+    const circle_line = LineWeight(separate_down, separate_up, linewidth, circle_material);
     return circle_line
+}
+
+function create_smooth_line(segments?: number | undefined, linewidth?: number | undefined): THREE.Group {
+    if (!segments)
+        segments = 16
+    if (!linewidth)
+        linewidth = 0.005
+    const smooth_func = (k: number) => new THREE.Vector3(0, 2 / segments! * k - 1, 0)
+    const smooth_line_package = new THREE.Group()
+    for (var i = 0; i < segments; ++i) {
+        const color = new THREE.Color().setHSL(0, 0, (i + 0.5) / segments);
+        const smooth_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const smooth_line = LineWeight(smooth_func(i), smooth_func(i + 1), linewidth, smooth_material);
+        smooth_line_package.add(smooth_line)
+    }
+    return smooth_line_package
+}
+
+function create_smooth_line_separate(height?: number | undefined, len?: number | undefined, linewidth?: number | undefined): THREE.Group {
+    if (!height)
+        height = -0.75
+    if (!len)
+        len = 0.075
+    if (!linewidth)
+        linewidth = 0.005
+    const smooth_line = new THREE.Group()
+    const smooth_func = (k: number) => {
+        const separate_down = new THREE.Vector3(Math.sin(k) * len!, height!, - Math.cos(k) * len!)
+        const separate_up = new THREE.Vector3(-Math.sin(k) * len!, height!, Math.cos(k) * len!)
+        const color = new THREE.Color().setHSL(0, 0, (height! + 1) / 2);
+        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const circle_line = LineWeight(separate_down, separate_up, linewidth, circle_material);
+        smooth_line.add(circle_line)
+    }
+    smooth_func(0)
+    smooth_func(Math.PI / 2)
+    return smooth_line
 }
