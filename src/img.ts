@@ -1,6 +1,6 @@
 import { convertFileSrc } from '@tauri-apps/api/tauri'
 import { listen } from '@tauri-apps/api/event'
-import { PhysicalSize, appWindow } from '@tauri-apps/api/window'
+import { appWindow } from '@tauri-apps/api/window'
 import ColorBarSample from './assets/ColorBar.png'
 import FlowerSample from './assets/Flower.jpg'
 import KawaiiSample from './assets/Kawaii.png'
@@ -11,12 +11,12 @@ import { randInt } from 'three/src/math/MathUtils'
 
 // https://zenn.dev/kumassy/books/6e518fe09a86b2/viewer/1dbeeb\
 export function img_load_init() {
+    let img_src_size: [number, number]
 
     let unlisten: any;
     let unlisten_resize: any;
-    let img_src_size: [number, number];
 
-    let file_img = document.querySelector<HTMLImageElement>("#file_img");
+    const file_img = document.querySelector<HTMLImageElement>("#file_img");
     if (file_img?.parentElement) {
         file_img.src = Array(ColorBarSample, FlowerSample, KawaiiSample, MountainSample, PenguinSample, WindmillSample)[randInt(0, 5)]
         get_img_src_size(file_img.src, size => {
@@ -34,14 +34,35 @@ export function img_load_init() {
         } else if (ev.payload.type === 'drop') {
             console.log('User dropped', ev.payload.paths);
             const [filepath] = ev.payload.paths// as string[]
-            img_load(filepath)
+            img_load(convertFileSrc(filepath))
+            get_img_src_size(convertFileSrc(filepath), size => {
+                let file_img = document.querySelector<HTMLImageElement>("#file_img");
+                if (file_img) {
+                    img_src_size = size
+                    const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
+                    file_img.width = aspect[0]
+                    file_img.height = aspect[1]
+                }
+            })
         }
     })
 
     async function f() {
         unlisten = await listen('img_load', event => {
-            console.log(`open_file_dialog ${event.payload.message} ${new Date()}`);
-            img_load(event.payload.message)
+            const msg_kit = (ev: any) => ev.payload.message
+            const msg: string = msg_kit(event)
+            if (msg) {
+                img_load(convertFileSrc(msg))
+                get_img_src_size(convertFileSrc(msg), size => {
+                    let file_img = document.querySelector<HTMLImageElement>("#file_img");
+                    if (file_img) {
+                        img_src_size = size
+                        const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
+                        file_img.width = aspect[0]
+                        file_img.height = aspect[1]
+                    }
+                })
+            }
         })
         unlisten_resize = await appWindow.onResized(({ payload: size }) => {
             // console.log('Window resized', size);
@@ -65,7 +86,7 @@ export function img_load_init() {
 
 function img_load(path: string) {
     let file_img = document.querySelector<HTMLImageElement>("#file_img");
-    file_img!.src = convertFileSrc(path)
+    file_img!.src = path
 }
 
 function get_img_src_size(src: string, callback: (result: [number, number]) => void) {

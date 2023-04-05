@@ -3,8 +3,8 @@ import { TGALoader } from 'three/examples/jsm/loaders/TGALoader';
 import GridHorizontal from './assets/GridHorizontal.tga?url'
 import GridVertical from './assets/GridVertical.tga?url'
 import * as THREE from 'three';
-import { register, unregister } from '@tauri-apps/api/globalShortcut';
-import { event } from '@tauri-apps/api';
+
+// https://white-sesame.jp/archives/blog/3062
 
 export function threeviewer(threecanvas: any, param: { initNodeNumS: number, initNodeNumL: number, initNodeNumH: number }) {
     let unlisten_resize: any;
@@ -45,11 +45,11 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         group.add(mesh)
     }
 
-    for (var k = 0; k < param.initNodeNumL; k++) {
+    for (var k = 0; k < param.initNodeNumL; ++k) {
         const elevation = param.initNodeNumL == 1 ? 0.0 : Math.PI * 2 / param.initNodeNumL * k;
-        for (var j = 1; j <= param.initNodeNumS; j++) {
+        for (var j = 1; j <= param.initNodeNumS; ++j) {
             const radius = 1 / param.initNodeNumS * j;
-            for (var i = 0; i < param.initNodeNumH; i++) {
+            for (var i = 0; i < param.initNodeNumH; ++i) {
                 const azimuth = param.initNodeNumH == 1 ? 0.0 : Math.PI / (param.initNodeNumH - 1) * i + Math.PI / 2;
                 const rot = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), azimuth).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), elevation));
                 const pos = new THREE.Vector3(0, 0, radius).applyQuaternion(rot);
@@ -64,7 +64,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     var axisMeshHorizontal = new THREE.Group();
     new TGALoader().load(GridVertical, texture => {
         const axis_geometry = new THREE.PlaneGeometry(2, 2, 10, 10);
-        const axis_material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
+        const axis_material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide, fog: false });
         axis_material.alphaTest = 0.01
         const axis_mesh = new THREE.Mesh(axis_geometry, axis_material);
         const axis_mesh_cross = new THREE.Mesh(axis_geometry, axis_material);
@@ -72,22 +72,16 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         axisMeshVertical.add(axis_mesh)
         axisMeshVertical.add(axis_mesh_cross)
     })
-    new TGALoader().load(GridHorizontal, texture => {
-        const axis_geometry = new THREE.PlaneGeometry(2, 2, 10, 10);
-        const axis_material: THREE.MeshBasicMaterial = new THREE.MeshBasicMaterial({ map: texture, transparent: true, side: THREE.DoubleSide });
-        axis_material.alphaTest = 0.01
-        const axis_mesh = new THREE.Mesh(axis_geometry, axis_material);
-        axis_mesh.rotation.x += Math.PI / 2;
-        axisMeshHorizontal.add(axis_mesh)
-    })
     axisGroup.add(axisMeshVertical)
+    axisMeshHorizontal.add(create_rainbow_circle_frame(0.5, 64))
+    axisMeshHorizontal.add(create_rainbow_circle_frame(1, 64))
+    for (var i = 0; i < 8; ++i) {
+        axisMeshHorizontal.add(create_rainbow_circle_line(2 * Math.PI / 8 * i))
+        axisMeshHorizontal.add(create_rainbow_circle_frame_separate(0.75, 2 * Math.PI / 8 * i))
+        axisMeshHorizontal.add(create_rainbow_circle_frame_separate(0.25, 2 * Math.PI / 8 * i, 0.05))
+    }
     axisGroup.add(axisMeshHorizontal)
     group.add(axisGroup)
-
-    var circle_geometry = new THREE.CircleGeometry(0.6, 32);
-    var circle_material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-    var circle = new THREE.Mesh(circle_geometry, circle_material);
-    group.add(circle)
 
     async function f() {
         unlisten_resize = await appWindow.onResized(({ payload: size }) => {
@@ -118,7 +112,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         document.addEventListener('keyup', e => key_func(e, false), false); // 第一引数にkeydownを記述
 
         function animate() {
-            for (var i = 0; i < 1; i++) {
+            for (var i = 0; i < 1; ++i) {
                 if (key_down.w)
                     x_speed += 0.005
                 if (key_down.a)
@@ -170,4 +164,81 @@ function positionToHSL(pos: THREE.Vector3) {
     }
 
     return hsl;
+}
+
+function create_circle_frame_geometry(radius?: number | undefined, segments?: number | undefined, thetaStart?: number | undefined, thetaLength?: number | undefined): THREE.BufferGeometry {
+    if (!radius)
+        radius = 2
+    if (!segments)
+        segments = 32
+    const geometry = new THREE.BufferGeometry()
+    const verticesImpl = []
+    for (var i = 0; i < segments; ++i) {
+        verticesImpl.push(Math.cos(2 * Math.PI / segments * i))
+        verticesImpl.push(0)
+        verticesImpl.push(Math.sin(2 * Math.PI / segments * i))
+    }
+    const vertices = new Float32Array(verticesImpl)
+    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+
+    return geometry
+}
+
+function create_rainbow_circle_frame(radius?: number | undefined, segments?: number | undefined): THREE.Group {
+    if (!radius)
+        radius = 1
+    if (!segments)
+        segments = 32
+    const circle_func = (k: number) => [Math.cos(2 * Math.PI / segments! * k) * radius!, 0, Math.sin(2 * Math.PI / segments! * k) * radius!]
+    const rainbow_circle_frame = new THREE.Group()
+    for (var i = 0; i < segments; ++i) {
+        const circle_frame_geometry = new THREE.BufferGeometry()
+        const color = new THREE.Color().setHSL(0.75 - (i + 0.5) / segments, radius, 0.5);
+        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const vertices = new Float32Array(circle_func(i).concat(circle_func(i + 1)))
+        circle_frame_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+        const circle_frame = new THREE.Line(circle_frame_geometry, circle_material);
+        rainbow_circle_frame.add(circle_frame)
+    }
+    return rainbow_circle_frame
+}
+
+function create_rainbow_circle_line(theta?: number | undefined, segments?: number | undefined): THREE.Group {
+    if (!theta)
+        theta = 0
+    if (!segments)
+        segments = 16
+    const circle_func = (k: number) => [Math.sin(theta! + Math.PI) / segments! * k, 0, Math.cos(theta! + Math.PI) / segments! * k]
+    const rainbow_circle_line = new THREE.Group()
+    for (var i = 0; i < segments; ++i) {
+        const circle_line_geometry = new THREE.BufferGeometry()
+        const color = new THREE.Color().setHSL(theta / Math.PI / 2, (i + 0.5) / segments, 0.5);
+        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const vertices = new Float32Array(circle_func(i).concat(circle_func(i + 1)))
+        circle_line_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+        const circle_line = new THREE.Line(circle_line_geometry, circle_material);
+        rainbow_circle_line.add(circle_line)
+    }
+    return rainbow_circle_line
+}
+
+
+function create_rainbow_circle_frame_separate(radius?: number | undefined, theta?: number | undefined, len?: number | undefined): THREE.Line<THREE.BufferGeometry, THREE.LineBasicMaterial> {
+    if (!radius)
+        radius = 0.75
+    if (!theta)
+        theta = 0
+    if (!len)
+        len = 0.075
+    const separate_middle = [Math.sin(theta + Math.PI) * radius, Math.cos(theta + Math.PI) * radius]
+    const separate_down = [separate_middle[0] + Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] - Math.cos(Math.PI / 2 - theta) * len]
+    const separate_up = [separate_middle[0] - Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] + Math.cos(Math.PI / 2 - theta) * len]
+
+    const circle_line_geometry = new THREE.BufferGeometry()
+    const color = new THREE.Color().setHSL(theta / Math.PI / 2, radius, 0.5);
+    const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+    const vertices = new Float32Array(separate_down.concat(separate_up))
+    circle_line_geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+    const circle_line = new THREE.Line(circle_line_geometry, circle_material);
+    return circle_line
 }

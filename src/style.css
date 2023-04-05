@@ -54,6 +54,13 @@ button {
   margin-bottom: auto;
 }
 
+#file_img {
+  user-select: none;
+  /* user-drag: none; */
+  -webkit-user-drag: none;
+  -moz-user-select: none;
+}
+
 body {
   margin: 0;
   display: flex;
