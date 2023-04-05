@@ -81,7 +81,16 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
     group.add(axisGroup)
 
+    const colorSphereMaterial = new THREE.MeshBasicMaterial({ color: 0x88ffffff });
+    const colorSphereGeometry = new THREE.SphereGeometry(0.1); // サイズ, 分割数
+    const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
+    colorSphereMesh.visible = false
+    group.add(colorSphereMesh)
+
     async function f() {
+        group.rotation.x += 0.4;
+        group.rotation.y += 0.4;
+
         unlisten_resize = await appWindow.onResized(({ payload: size }) => {
             renderer.setSize(size.width / 2, size.height)
             const aspect_camera = aspectCamera([size.width / 2, size.height]);
@@ -90,6 +99,40 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
             camera.top = aspect_camera[1]
             camera.bottom = -aspect_camera[1]
             camera.updateProjectionMatrix();
+        });
+
+        var mouse_press: boolean = false;
+        const file_img = document.querySelector<HTMLImageElement>("#file_img");
+        file_img?.addEventListener("mousedown", () => mouse_press = true)
+        file_img?.addEventListener("mouseup", () => mouse_press = false)
+
+        var image_position: [number, number] = [0, 0];
+        var mouse_on_img: boolean = false;
+        window.onmousemove = (e) => {
+            if (mouse_on_img) {
+                var rect = file_img!.getBoundingClientRect();
+                image_position[0] = (e.pageX - rect.left) // * (file_img!.naturalWidth / file_img!.width)
+                image_position[1] = (e.pageY - rect.top)  // * (file_img!.naturalHeight / file_img!.height)
+                const canvas = document.createElement('canvas');
+                canvas.width = file_img!.width
+                canvas.height = file_img!.height
+                const context = canvas.getContext('2d');
+                context!.drawImage(file_img!, 0, 0, canvas.width, canvas.height);
+                const imgData = context?.getImageData(Math.round(image_position[0]), Math.round(image_position[1]), 1, 1);
+                const implData = imgData?.data
+                if (implData) {
+                    colorSphereMesh.visible = true
+                    colorSphereMesh.material.color = new THREE.Color().setRGB(implData[0] / 255, implData[1] / 255, implData[2] / 255)
+                }
+            }
+            else colorSphereMesh.visible = false
+        };
+        window.addEventListener("mouseover", event => {
+            if (event?.target)
+                if (file_img == event.target)
+                    mouse_on_img = true
+                else mouse_on_img = false
+            else mouse_on_img = false
         });
 
         var x_speed: number = 0;
@@ -107,23 +150,24 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
                 key_down.d = press
         }
         document.addEventListener('keydown', e => key_func(e, true), false); // 第一引数にkeydownを記述
-        document.addEventListener('keyup', e => key_func(e, false), false); // 第一引数にkeydownを記述
+        document.addEventListener('keyup', e => key_func(e, false), false); // 第一引数にkeyupを記述
 
         function animate() {
-            for (var i = 0; i < 1; ++i) {
-                if (key_down.w)
-                    x_speed -= 0.005
-                if (key_down.a)
-                    y_speed -= 0.005
-                if (key_down.s)
-                    x_speed += 0.005
-                if (key_down.d)
-                    y_speed += 0.005
-                group.rotation.x += x_speed;
-                x_speed *= 0.85;
-                group.rotation.y += y_speed;
-                y_speed *= 0.85;
+            if (key_down.w)
+                x_speed -= 0.005
+            if (key_down.a)
+                y_speed -= 0.005
+            if (key_down.s)
+                x_speed += 0.005
+            if (key_down.d)
+                y_speed += 0.005
+            if (mouse_press) {
             }
+            group.rotation.x += x_speed;
+            x_speed *= 0.85;
+            group.rotation.y += y_speed;
+            y_speed *= 0.85;
+
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }

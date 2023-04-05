@@ -36,13 +36,10 @@ export function img_load_init() {
             const [filepath] = ev.payload.paths// as string[]
             img_load(convertFileSrc(filepath))
             get_img_src_size(convertFileSrc(filepath), size => {
-                let file_img = document.querySelector<HTMLImageElement>("#file_img");
-                if (file_img) {
-                    img_src_size = size
-                    const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
-                    file_img.width = aspect[0]
-                    file_img.height = aspect[1]
-                }
+                img_src_size = size
+                const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
+                file_img!.width = aspect[0]
+                file_img!.height = aspect[1]
             })
         }
     })
@@ -54,19 +51,14 @@ export function img_load_init() {
             if (msg) {
                 img_load(convertFileSrc(msg))
                 get_img_src_size(convertFileSrc(msg), size => {
-                    let file_img = document.querySelector<HTMLImageElement>("#file_img");
-                    if (file_img) {
-                        img_src_size = size
-                        const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
-                        file_img.width = aspect[0]
-                        file_img.height = aspect[1]
-                    }
+                    img_src_size = size
+                    const aspect = img_size_aspect(size, [window.innerWidth / 2, window.innerHeight])
+                    file_img!.width = aspect[0]
+                    file_img!.height = aspect[1]
                 })
             }
         })
         unlisten_resize = await appWindow.onResized(({ payload: size }) => {
-            // console.log('Window resized', size);
-            let file_img = document.querySelector<HTMLImageElement>("#file_img");
             if (file_img?.parentElement) {
                 const aspect = img_size_aspect(img_src_size, [size.width / 2, size.height])
                 file_img!.width = aspect[0]
