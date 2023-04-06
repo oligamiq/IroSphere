@@ -10,7 +10,7 @@ windows: msi<br>
 linux(debian系列): deb <br>
 linux: AppImage<br>
 mac: dmg<br>
-※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません
+※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません<br>
 ※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください
 
 ## 使い方
