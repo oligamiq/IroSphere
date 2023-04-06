@@ -1,4 +1,3 @@
-import { appWindow } from '@tauri-apps/api/window';
 import * as THREE from 'three';
 import { LineWeight } from './meshLine';
 
@@ -99,9 +98,9 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         group.rotation.x += 0.4;
         group.rotation.y += 0.4;
 
-        unlisten_resize = await appWindow.onResized(({ payload: size }) => {
-            renderer.setSize(size.width / 2, size.height)
-            const aspect_camera = aspectCamera([size.width / 2, size.height]);
+        unlisten_resize = await window.addEventListener('resize', () => {
+            renderer.setSize(window.innerWidth / 2, window.innerHeight)
+            const aspect_camera = aspectCamera([window.innerWidth / 2, window.innerHeight]);
             camera.left = -aspect_camera[0]
             camera.right = aspect_camera[0]
             camera.top = aspect_camera[1]

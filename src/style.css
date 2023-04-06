@@ -52,6 +52,7 @@ button {
   max-height: 100%;
   margin-top: auto;
   margin-bottom: auto;
+  background-color: #d0d0d0;
 }
 
 #file_img {
@@ -65,6 +66,7 @@ body {
   margin: 0;
   display: flex;
   place-items: center;
+  background-color: #d0d0d0;
 }
 
 @media (prefers-color-scheme: light) {
