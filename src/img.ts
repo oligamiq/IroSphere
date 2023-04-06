@@ -5,7 +5,7 @@ import MountainSample from './assets/Mountain.jpg'
 import PenguinSample from './assets/Penguin.jpg'
 import WindmillSample from './assets/Windmill.jpg'
 import { randInt } from 'three/src/math/MathUtils'
-import { listen_img_load, open_file_dialog } from './tauri_or_web'
+import { listen_img_load, onFileDropEvent, open_file_dialog } from './tauri_or_web'
 
 // https://zenn.dev/kumassy/books/6e518fe09a86b2/viewer/1dbeeb\
 export function img_load_init() {
@@ -26,6 +26,8 @@ export function img_load_init() {
         file_img.src = Array(ColorBarSample, FlowerSample, KawaiiSample, MountainSample, PenguinSample, WindmillSample)[randInt(0, 5)]
         get_img_src_size(file_img.src, load_img)
     }
+
+    onFileDropEvent(load_img)
 
     document.addEventListener('keyup', e => {
         if (e.ctrlKey && e.key == 'o') {
@@ -75,16 +77,20 @@ export function open_file_dialog_web(load_img: any) {
     input.accept = 'image/*';
     input.onchange = event => {
         const file = (event!.target! as HTMLInputElement)!.files![0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            const filepath_impl = e.target!.result!;
-            if (typeof (filepath_impl) == 'string') {
-                const filepath = filepath_impl
-                img_load(filepath)
-                get_img_src_size(filepath, load_img)
-            }
-        };
+        read_file_and_load_img(file, load_img)
     };
     input.click();
+}
+
+export function read_file_and_load_img(file: File, load_img: any) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+        const filepath_impl = e.target!.result!;
+        if (typeof (filepath_impl) == 'string') {
+            const filepath = filepath_impl
+            img_load(filepath)
+            get_img_src_size(filepath, load_img)
+        }
+    };
 }
