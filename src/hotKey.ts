@@ -1,4 +1,3 @@
-import { invoke } from '@tauri-apps/api';
 // import { register, unregister } from '@tauri-apps/api/globalShortcut';
 import { appWindow } from '@tauri-apps/api/window';
 
@@ -14,9 +13,6 @@ export function registerShortcut() {
     document.addEventListener('keyup', e => {
         if (e.key == 'F11')
             appWindow.isFullscreen().then(isFullScreen => appWindow.setFullscreen(!isFullScreen))
-        if (e.ctrlKey)
-            if (e.key == 'o')
-                invoke('open_file_dialog', {})
         if (e.key == 'Escape')
             appWindow.setFullscreen(false)
     }, false); // 第一引数にkeydownを記述
