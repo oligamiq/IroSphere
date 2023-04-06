@@ -5,7 +5,7 @@
 
 ## install方法
 このgithubのページの右の方にある[Release](https://github.com/oligami-0424/IroSphere/releases/latest)から、それぞれのプラットフォームにあったinstallerをダウンロードし、実行してください。<br>
-[web版](https://oligami-0424.github.io/IroSphere/)
+[web版](https://oligami-0424.github.io/IroSphere/) <br>
 windows: msi<br>
 linux(debian系列): deb <br>
 linux: AppImage<br>
