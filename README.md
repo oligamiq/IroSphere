@@ -19,6 +19,9 @@ mac: dmg<br>
 Ctrl+O Alt+Oもしくはドラッグアンドドロップで画像ファイルを読み込みます。<br>
 Fキーなどの便利機能や他の機能などは搭載していません。誰かプルリクを出してもいいですよ
 
+## バグ
+- なぜか本番環境では[この画像](https://github.com/oligami-0424/IroSphere/blob/main/src/assets/ColorBar.png)が読み込まれない（少なくともwindows）
+
 ## 重要
 - アイコンがデフォルトなので早く変更する！！<br>
 誰かアイコンくれてもいいですよ！
