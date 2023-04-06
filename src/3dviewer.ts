@@ -12,8 +12,8 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
     const aspect_camera = aspectCamera([window.innerWidth / 2, window.innerHeight]);
 
-    const camera = new THREE.OrthographicCamera(-aspect_camera[0], aspect_camera[0], aspect_camera[1], -aspect_camera[1], -1.1, 1.1);
-    camera.position.set(0, 0, 0); // カメラの位置
+    const camera = new THREE.OrthographicCamera(-aspect_camera[0], aspect_camera[0], aspect_camera[1], -aspect_camera[1], -3.9, 6.1);
+    camera.position.set(0, 0, 5); // カメラの位置
     camera.lookAt(0, 0, 0); // 注視点の座標
     const controls = new OrbitControls(camera, threecanvas)
     controls.enableDamping = true;
