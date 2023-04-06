@@ -31,6 +31,7 @@ export function open_file_dialog(load_img: any) {
 }
 
 export function onFileDropEvent(load_img: any) {
+    // if (load_img) { } // web
     // tauri
     appWindow.onFileDropEvent((ev) => {
         if (ev.payload.type === 'hover') {
@@ -46,6 +47,7 @@ export function onFileDropEvent(load_img: any) {
 }
 
 export async function listen_img_load(load_img: any) {
+    // if (load_img) { } // web
     // tauri
     await listen('img_load', event => {
         const msg: string = ((ev: any) => ev.payload.message)(event)
