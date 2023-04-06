@@ -1,5 +1,5 @@
 // web
-import { open_file_dialog_web } from "./img";
+// import { open_file_dialog_web } from "./img";
 // web end
 
 // tauri
@@ -23,7 +23,10 @@ export function registerShortcut() {
 }
 
 export function open_file_dialog(load_img: any) {
-    invoke('open_file_dialog', {}) // tauri
+    // tauri
+    if (load_img)
+        invoke('open_file_dialog', {})
+    // tauri end
     // open_file_dialog_web(load_img) // web
 }
 
