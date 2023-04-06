@@ -1,6 +1,6 @@
 [package]
 name = "IroSphere"
-version = "0.0.2"
+version = "0.0.3"
 description = "A Tauri App"
 authors = ["oligami"]
 license = "MIT License"
@@ -15,8 +15,9 @@ rust-version = "1.59"
 tauri-build = { version = "1.2.1", features = [] }
 
 [dependencies]
-tauri = { version = "1.2.4", features = ["updater"] }
+tauri = { version = "1.2.4", features = ["dialog-open", "global-shortcut-all", "protocol-asset", "updater", "window-set-fullscreen"] }
 serde = { version = "1.0", features = ["derive"] }
+hotwatch = {version = "0.4.6"}
 serde_json = "1.0"
 
 [features]
