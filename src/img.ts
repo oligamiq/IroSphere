@@ -27,7 +27,7 @@ export function img_load_init() {
         get_img_src_size(file_img.src, load_img)
     }
 
-    onFileDropEvent(file_img)
+    onFileDropEvent(load_img)
 
     document.addEventListener('keyup', e => {
         if (e.ctrlKey && e.key == 'o') {
