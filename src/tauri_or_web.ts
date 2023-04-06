@@ -32,8 +32,8 @@ export function open_file_dialog(load_img: any) {
 
 export function onFileDropEvent(load_img: any) {
     // web
-    const app = document.querySelector<HTMLDivElement>('#app')
-    app!.ondrop = ((ev) => {
+    // const app = document.querySelector<HTMLDivElement>('#app')
+    document.body.addEventListener('drop', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
         let types = ev.dataTransfer?.types
