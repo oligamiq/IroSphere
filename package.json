@@ -7,6 +7,7 @@
     "tauri": "tauri",
     "dev": "vite",
     "build": "tsc && vite build",
+    "githubPages": "tsc && vite build --outDir docs",
     "preview": "vite preview"
   },
   "devDependencies": {
