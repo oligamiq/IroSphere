@@ -30,6 +30,7 @@ export function img_load_init() {
     document.addEventListener('keyup', e => {
         if (e.ctrlKey && e.key == 'o') {
             open_file_dialog(load_img)
+            e.preventDefault();
         }
     }, false);
 
