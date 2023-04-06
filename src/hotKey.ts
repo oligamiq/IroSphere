@@ -1,5 +1,5 @@
 import { invoke } from '@tauri-apps/api';
-import { register, unregister } from '@tauri-apps/api/globalShortcut';
+// import { register, unregister } from '@tauri-apps/api/globalShortcut';
 import { appWindow } from '@tauri-apps/api/window';
 
 // https://tauri.app/v1/api/js/globalshortcut/#docusaurus_skipToContent_fallback
