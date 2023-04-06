@@ -34,7 +34,9 @@ export function onFileDropEvent(load_img: any) {
     // web
     const app = document.querySelector<HTMLDivElement>('#app')
     const isValid = (e: any) => e.dataTransfer.types.indexOf("Files") >= 0;
+    console.log(app)
     app!.addEventListener('dragover', (e) => {
+        console.log('dragover')
         e.preventDefault();
         e.stopPropagation();
         if (e.dataTransfer) {
@@ -46,6 +48,7 @@ export function onFileDropEvent(load_img: any) {
     })
     app!.addEventListener('dragleave', (e) => e.stopPropagation())
     app!.addEventListener('drop', (e) => {
+        console.log('drop')
         e.preventDefault();
         e.stopPropagation();
         let file = e.dataTransfer!.files[0];
