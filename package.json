@@ -1,12 +1,13 @@
 {
   "name": "irosphere",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "scripts": {
     "tauri": "tauri",
     "dev": "vite",
     "build": "tsc && vite build",
+    "githubPages": "tsc && vite build --outDir docs --base=\"./\"",
     "preview": "vite preview"
   },
   "devDependencies": {

@@ -1,8 +1,8 @@
-import { invoke } from '@tauri-apps/api'
+// import { invoke } from '@tauri-apps/api'
 import './style.css'
 import { threeviewer } from './3dviewer'
 import { img_load_init } from './img'
-import { registerShortcut } from './hotKey'
+import { registerShortcut } from './tauri_or_web';
 
 registerShortcut();
 
@@ -15,11 +15,6 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 
 window.addEventListener("DOMContentLoaded", () => {
 });
-
-invoke('greet', { name: 'World' })
-  // `invoke` returns a Promise
-  .then((response) => console.log(response))
-
 
 img_load_init()
 
