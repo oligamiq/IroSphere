@@ -5,7 +5,7 @@ import MountainSample from './assets/Mountain.jpg'
 import PenguinSample from './assets/Penguin.jpg'
 import WindmillSample from './assets/Windmill.jpg'
 import { randInt } from 'three/src/math/MathUtils'
-import { listen_img_load, open_file_dialog } from './tauri_or_web'
+import { listen_img_load, onFileDropEvent, open_file_dialog } from './tauri_or_web'
 
 // https://zenn.dev/kumassy/books/6e518fe09a86b2/viewer/1dbeeb\
 export function img_load_init() {
@@ -26,6 +26,8 @@ export function img_load_init() {
         file_img.src = Array(ColorBarSample, FlowerSample, KawaiiSample, MountainSample, PenguinSample, WindmillSample)[randInt(0, 5)]
         get_img_src_size(file_img.src, load_img)
     }
+
+    onFileDropEvent(file_img)
 
     document.addEventListener('keyup', e => {
         if (e.ctrlKey && e.key == 'o') {

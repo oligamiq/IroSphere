@@ -32,11 +32,8 @@ export function open_file_dialog(load_img: any) {
 
 export function onFileDropEvent(load_img: any) {
     // web
-    const app = document.querySelector<HTMLDivElement>('#app')
     const isValid = (e: any) => e.dataTransfer.types.indexOf("Files") >= 0;
-    console.log(app)
-    app!.addEventListener('dragover', (e) => {
-        console.log('dragover')
+    document.body.addEventListener('dragover', (e) => {
         e.preventDefault();
         e.stopPropagation();
         if (e.dataTransfer) {
@@ -46,9 +43,8 @@ export function onFileDropEvent(load_img: any) {
             e.dataTransfer.dropEffect = "copy";
         }
     })
-    app!.addEventListener('dragleave', (e) => e.stopPropagation())
-    app!.addEventListener('drop', (e) => {
-        console.log('drop')
+    document.body.addEventListener('dragleave', (e) => e.stopPropagation())
+    document.body.addEventListener('drop', (e) => {
         e.preventDefault();
         e.stopPropagation();
         let file = e.dataTransfer!.files[0];
