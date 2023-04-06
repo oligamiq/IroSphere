@@ -28,6 +28,10 @@
   text-align: center;
 }
 
+#threeCanvas {
+  overscroll-behavior: initial;
+}
+
 input,
 button {
   border-radius: 8px;

@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { LineWeight } from './meshLine';
-
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 // https://white-sesame.jp/archives/blog/3062
 
@@ -12,9 +12,12 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
     const aspect_camera = aspectCamera([window.innerWidth / 2, window.innerHeight]);
 
-    const camera = new THREE.OrthographicCamera(-aspect_camera[0], aspect_camera[0], aspect_camera[1], -aspect_camera[1], -1.1, 1.1);
-    camera.position.set(0, 0, 0); // カメラの位置
+    const camera = new THREE.OrthographicCamera(-aspect_camera[0], aspect_camera[0], aspect_camera[1], -aspect_camera[1], -3.9, 6.1);
+    camera.position.set(0, 0, 5); // カメラの位置
     camera.lookAt(0, 0, 0); // 注視点の座標
+    const controls = new OrbitControls(camera, threecanvas)
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.2;;
 
     let renderer: any
     if (threecanvas)
@@ -92,9 +95,9 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     const colorSphereGeometry = new THREE.SphereGeometry(0.1); // サイズ, 分割数
     const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
     colorSphereMesh.visible = false
-    group.add(colorSphereMesh)
+    group.add(colorSphereMesh);
 
-    async function f() {
+    (async () => {
         group.rotation.x += 0.4;
         group.rotation.y += 0.4;
 
@@ -209,13 +212,13 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
             x_speed *= 0.85;
             group.rotation.y += y_speed;
             y_speed *= 0.85;
+            controls.update();
 
             requestAnimationFrame(animate);
             renderer.render(scene, camera);
         }
         animate();
-    }
-    f()
+    })()
 
     return () => {
         if (unlisten_resize)
