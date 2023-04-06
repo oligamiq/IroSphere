@@ -251,23 +251,23 @@ function positionToHSL(pos: THREE.Vector3) {
     return hsl;
 }
 
-function create_circle_frame_geometry(radius?: number | undefined, segments?: number | undefined): THREE.BufferGeometry {
-    if (!radius)
-        radius = 2
-    if (!segments)
-        segments = 32
-    const geometry = new THREE.BufferGeometry()
-    const verticesImpl = []
-    for (var i = 0; i < segments; ++i) {
-        verticesImpl.push(Math.cos(2 * Math.PI / segments * i))
-        verticesImpl.push(0)
-        verticesImpl.push(Math.sin(2 * Math.PI / segments * i))
-    }
-    const vertices = new Float32Array(verticesImpl)
-    geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
+// function create_circle_frame_geometry(radius?: number | undefined, segments?: number | undefined): THREE.BufferGeometry {
+//     if (!radius)
+//         radius = 2
+//     if (!segments)
+//         segments = 32
+//     const geometry = new THREE.BufferGeometry()
+//     const verticesImpl = []
+//     for (var i = 0; i < segments; ++i) {
+//         verticesImpl.push(Math.cos(2 * Math.PI / segments * i))
+//         verticesImpl.push(0)
+//         verticesImpl.push(Math.sin(2 * Math.PI / segments * i))
+//     }
+//     const vertices = new Float32Array(verticesImpl)
+//     geometry.setAttribute('position', new THREE.BufferAttribute(vertices, 3))
 
-    return geometry
-}
+//     return geometry
+// }
 
 function create_rainbow_circle_frame(radius?: number | undefined, segments?: number | undefined, linewidth?: number | undefined): THREE.Group {
     if (!radius)
@@ -409,13 +409,11 @@ function hslToPosition(hsl: { h: number; s: number; l: number; }): THREE.Vector3
     return position;
 }
 
-function positionToRotation(position: THREE.Vector3): THREE.Quaternion {
-    let p = position.clone();
-    p.y = 0;
-    if (p.lengthSq() > Number.EPSILON) {
-        return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(p, new THREE.Vector3(), new THREE.Vector3(0, 1, 0)));
-    }
-    return new THREE.Quaternion();
-}
-
-
+// function positionToRotation(position: THREE.Vector3): THREE.Quaternion {
+//     let p = position.clone();
+//     p.y = 0;
+//     if (p.lengthSq() > Number.EPSILON) {
+//         return new THREE.Quaternion().setFromRotationMatrix(new THREE.Matrix4().lookAt(p, new THREE.Vector3(), new THREE.Vector3(0, 1, 0)));
+//     }
+//     return new THREE.Quaternion();
+// }

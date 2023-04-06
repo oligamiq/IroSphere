@@ -1,6 +1,6 @@
 [package]
 name = "IroSphere"
-version = "0.0.3"
+version = "1.0.0"
 description = "A Tauri App"
 authors = ["oligami"]
 license = "MIT License"
