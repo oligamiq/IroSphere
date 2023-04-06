@@ -1,5 +1,5 @@
 // web
-// import { get_img_src_size, img_load, open_file_dialog_web } from "./img";
+import { open_file_dialog_web } from "./img";
 // web end
 
 // tauri
