@@ -33,17 +33,23 @@ export function open_file_dialog(load_img: any) {
 export function onFileDropEvent(load_img: any) {
     // web
     // const app = document.querySelector<HTMLDivElement>('#app')
-    document.body.addEventListener('drop', (ev) => {
-        ev.preventDefault();
-        ev.stopPropagation();
-        let types = ev.dataTransfer?.types
-        let isFiles = false
-        if (types?.filter(_ => "Files").length)
-            isFiles = types?.filter(_ => "Files").length > 0
-        if (isFiles) {
-            let file = ev.dataTransfer!.files[0];
-            read_file_and_load_img(file, load_img)
+    const isValid = (e: any) => e.dataTransfer.types.indexOf("Files") >= 0;
+    document.body.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        if (e.dataTransfer) {
+            if (!isValid(e)) {
+                e.dataTransfer.dropEffect = "none"; return;
+            }
+            e.dataTransfer.dropEffect = "copy";
         }
+    })
+    document.body.addEventListener('dragleave', (e) => e.stopPropagation())
+    document.body.addEventListener('drop', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        let file = e.dataTransfer!.files[0];
+        read_file_and_load_img(file, load_img)
     })
     // web end
     // tauri
