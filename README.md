@@ -1,7 +1,7 @@
 # IroSphere
 
 これは[Tali](https://github.com/TaliPhoto)さんが、[youtube](https://youtu.be/jrCr4j_qdPo)で紹介した、アイデアまで含めてCC0のソフトであるIroSphereというソフトをtauriというフレームワークで一から書き直したものです。<br>
-[本家](https://github.com/TaliPhoto/IroSphere)
+[本家](https://github.com/TaliPhoto/IroSphere)<br>
 機能の要望などはissueなどにお願いします。
 
 ## install方法
