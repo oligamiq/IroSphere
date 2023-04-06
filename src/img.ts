@@ -17,6 +17,7 @@ export function img_load_init() {
     let unlisten_resize: any;
 
     const file_img = document.querySelector<HTMLImageElement>("#file_img");
+    file_img!.crossOrigin = 'anonymous'
     if (file_img?.parentElement) {
         file_img.src = Array(ColorBarSample, FlowerSample, KawaiiSample, MountainSample, PenguinSample, WindmillSample)[randInt(0, 5)]
         get_img_src_size(file_img.src, size => {

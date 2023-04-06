@@ -28,34 +28,15 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     renderer.setSize(window.innerWidth / 2, window.innerHeight);
 
     const group = new THREE.Group();
+
+    var additiveNodesNum = 0
+    var additiveNodesBeforePos: { x: number, y: number }
+    let additiveNodes: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>[] = []
+    const AdditiveNodesGroup = new THREE.Group();
+    group.add(AdditiveNodesGroup)
+
     var group_sphere: any = [];
     scene.add(group)
-
-    const createMesh = function (size: number, pos: THREE.Vector3, divide: [number, number], visible: boolean) {
-        const hsl: any = positionToHSL(pos)
-        const color = new THREE.Color().setHSL(hsl.h, hsl.s, hsl.l);
-        const material = new THREE.MeshBasicMaterial({ color: color });
-        const geometry = new THREE.SphereGeometry(size, divide[0], divide[1]); // サイズ, 分割数
-        const mesh = new THREE.Line(geometry, material);
-        mesh.position.set(pos.x, pos.y, pos.z);
-        if (!visible)
-            mesh.visible = false;
-        group_sphere.push(mesh)
-        group.add(mesh)
-    }
-
-    for (var k = 0; k < param.initNodeNumL; ++k) {
-        const elevation = param.initNodeNumL == 1 ? 0.0 : Math.PI * 2 / param.initNodeNumL * k;
-        for (var j = 1; j <= param.initNodeNumS; ++j) {
-            const radius = 1 / param.initNodeNumS * j;
-            for (var i = 0; i < param.initNodeNumH; ++i) {
-                const azimuth = param.initNodeNumH == 1 ? 0.0 : Math.PI / (param.initNodeNumH - 1) * i + Math.PI / 2;
-                const rot = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), azimuth).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), elevation));
-                const pos = new THREE.Vector3(0, 0, radius).applyQuaternion(rot);
-                createMesh(0.01, pos, [10, 5], j == param.initNodeNumS)
-            }
-        }
-    }
 
     // 軸の表示
     const axisGroup = new THREE.Group();
@@ -81,7 +62,34 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
     group.add(axisGroup)
 
-    const colorSphereMaterial = new THREE.MeshBasicMaterial({ color: 0x88ffffff });
+    const createMesh = function (size: number, pos: THREE.Vector3, divide: [number, number], visible: boolean, posKJI: { k: number, j: number, i: number }) {
+        const hsl: any = positionToHSL(pos)
+        const color = new THREE.Color().setHSL(hsl.h, hsl.s, hsl.l);
+        const material = new THREE.MeshBasicMaterial({ color: color });
+        const geometry = new THREE.SphereGeometry(size, divide[0], divide[1]); // サイズ, 分割数
+        const mesh = new THREE.Line(geometry, material);
+        mesh.position.set(pos.x, pos.y, pos.z);
+        if (!visible)
+            mesh.visible = false;
+        group_sphere.push({ mesh: mesh, pos: posKJI })
+        group.add(mesh)
+    }
+
+    for (var k = 0; k < param.initNodeNumL; ++k) {
+        const elevation = param.initNodeNumL == 1 ? 0.0 : Math.PI * 2 / param.initNodeNumL * k;
+        for (var j = 1; j <= param.initNodeNumS; ++j) {
+            const radius = 1 / param.initNodeNumS * j;
+            for (var i = 0; i < param.initNodeNumH; ++i) {
+                const azimuth = param.initNodeNumH == 1 ? 0.0 : Math.PI / (param.initNodeNumH - 1) * i + Math.PI / 2;
+                const rot = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), azimuth).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1, 0, 0), elevation));
+                const pos = new THREE.Vector3(0, 0, radius).applyQuaternion(rot);
+                createMesh(0.01, pos, [10, 5], j == param.initNodeNumS, { k: k, j: j, i: i })
+            }
+        }
+    }
+
+
+    const colorSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
     const colorSphereGeometry = new THREE.SphereGeometry(0.1); // サイズ, 分割数
     const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
     colorSphereMesh.visible = false
@@ -103,12 +111,30 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
         var mouse_press: boolean = false;
         const file_img = document.querySelector<HTMLImageElement>("#file_img");
-        file_img?.addEventListener("mousedown", () => mouse_press = true)
+        file_img?.addEventListener("mousedown", () => {
+            if (mouse_on_img) {
+                addPreviewNode(colorSphereMesh.material.color, colorSphereMesh.position)
+                mouse_press = true
+            }
+        })
         file_img?.addEventListener("mouseup", () => mouse_press = false)
 
         var image_position: [number, number] = [0, 0];
         var mouse_on_img: boolean = false;
-        window.onmousemove = (e) => {
+
+        const addPreviewNode = (color: THREE.Color, pos: THREE.Vector3) => {
+            const colorSphereMaterial = new THREE.MeshBasicMaterial({ color: color });
+            const colorSphereGeometry = new THREE.SphereGeometry(0.1); // サイズ, 分割数
+            const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
+            colorSphereMesh.position.set(pos.x, pos.y, pos.z)
+
+            additiveNodes.push(colorSphereMesh)
+            AdditiveNodesGroup.add(additiveNodes[additiveNodesNum])
+            additiveNodesBeforePos = { x: image_position[0], y: image_position[1] }
+            ++additiveNodesNum
+        }
+
+        window.addEventListener("mousemove", e => {
             if (mouse_on_img) {
                 var rect = file_img!.getBoundingClientRect();
                 image_position[0] = (e.pageX - rect.left) // * (file_img!.naturalWidth / file_img!.width)
@@ -122,17 +148,28 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
                 const implData = imgData?.data
                 if (implData) {
                     colorSphereMesh.visible = true
-                    colorSphereMesh.material.color = new THREE.Color().setRGB(implData[0] / 255, implData[1] / 255, implData[2] / 255)
-
+                    const color = new THREE.Color().setRGB(implData[0] / 255, implData[1] / 255, implData[2] / 255)
+                    colorSphereMesh.material.color = color
                     let hsl = rgbToHsl({ r: implData[0] / 255, g: implData[1] / 255, b: implData[2] / 255 });
                     const position = hslToPosition(hsl)
                     colorSphereMesh.position.set(position.x, position.y, position.z)
-                    const rotation = positionToRotation(position)
-                    colorSphereMesh.rotation.set(rotation.x, rotation.y, rotation.z)
+                    // const rotation = positionToRotation(position)s
+                    // colorSphereMesh.rotation.set(rotation.x, rotation.y, rotation.z)
+                    colorSphereMesh.scale.set(1.5, 1.5, 1.5)
+
+                    if (mouse_press) {
+                        if ((additiveNodesBeforePos.x - image_position[0]) ** 2 + (additiveNodesBeforePos.y - image_position[1]) ** 2 > 1000) {
+                            addPreviewNode(color, position)
+                        }
+                    }
                 }
             }
             else colorSphereMesh.visible = false
-        };
+        });
+        window.addEventListener("mouseout", event => {
+            if (event.relatedTarget === null)
+                colorSphereMesh.visible = false
+        })
         window.addEventListener("mouseover", event => {
             if (event?.target)
                 if (file_img == event.target)
@@ -243,7 +280,7 @@ function create_rainbow_circle_frame(radius?: number | undefined, segments?: num
     const rainbow_circle_frame = new THREE.Group()
     for (var i = 0; i < segments; ++i) {
         const color = new THREE.Color().setHSL(0.75 - (i + 0.5) / segments, radius, 0.5);
-        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const circle_material = new THREE.LineBasicMaterial({ color: color, side: THREE.DoubleSide });
         const circle_frame = LineWeight(circle_func(i), circle_func(i + 1), linewidth, circle_material);
 
         rainbow_circle_frame.add(circle_frame)
@@ -262,7 +299,7 @@ function create_rainbow_circle_line(theta?: number | undefined, segments?: numbe
     const rainbow_circle_line = new THREE.Group()
     for (var i = 0; i < segments; ++i) {
         const color = new THREE.Color().setHSL(theta / Math.PI / 2, (i + 0.5) / segments, 0.5);
-        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const circle_material = new THREE.LineBasicMaterial({ color: color, side: THREE.DoubleSide });
         const circle_line = LineWeight(circle_func(i), circle_func(i + 1), linewidth, circle_material);
         rainbow_circle_line.add(circle_line)
     }
@@ -283,7 +320,7 @@ function create_rainbow_circle_frame_separate(radius?: number | undefined, theta
     const separate_down = new THREE.Vector3(separate_middle[0] + Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] - Math.cos(Math.PI / 2 - theta) * len)
     const separate_up = new THREE.Vector3(separate_middle[0] - Math.sin(Math.PI / 2 - theta) * len, 0, separate_middle[1] + Math.cos(Math.PI / 2 - theta) * len)
     const color = new THREE.Color().setHSL(theta / Math.PI / 2, radius, 0.5);
-    const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+    const circle_material = new THREE.LineBasicMaterial({ color: color, side: THREE.DoubleSide });
     const circle_line = LineWeight(separate_down, separate_up, linewidth, circle_material);
     return circle_line
 }
@@ -297,7 +334,7 @@ function create_smooth_line(segments?: number | undefined, linewidth?: number | 
     const smooth_line_package = new THREE.Group()
     for (var i = 0; i < segments; ++i) {
         const color = new THREE.Color().setHSL(0, 0, (i + 0.5) / segments);
-        const smooth_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const smooth_material = new THREE.LineBasicMaterial({ color: color, side: THREE.DoubleSide });
         const smooth_line = LineWeight(smooth_func(i), smooth_func(i + 1), linewidth, smooth_material);
         smooth_line_package.add(smooth_line)
     }
@@ -316,7 +353,7 @@ function create_smooth_line_separate(height?: number | undefined, len?: number |
         const separate_down = new THREE.Vector3(Math.sin(k) * len!, height!, - Math.cos(k) * len!)
         const separate_up = new THREE.Vector3(-Math.sin(k) * len!, height!, Math.cos(k) * len!)
         const color = new THREE.Color().setHSL(0, 0, (height! + 1) / 2);
-        const circle_material = new THREE.LineBasicMaterial({ color: color, transparent: true, side: THREE.DoubleSide, fog: false });
+        const circle_material = new THREE.LineBasicMaterial({ color: color, side: THREE.DoubleSide });
         const circle_line = LineWeight(separate_down, separate_up, linewidth, circle_material);
         smooth_line.add(circle_line)
     }
