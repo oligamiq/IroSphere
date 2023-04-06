@@ -4,6 +4,7 @@
 [本家](https://github.com/TaliPhoto/IroSphere)
 
 ## install方法
+(デモページ)[https://oligami-0424.github.io/IroSphere/]<br><br>
 このgithubのページの右の方にある[Release](https://github.com/oligami-0424/IroSphere/releases/latest)から、それぞれのプラットフォームにあったinstallerをダウンロードし、実行してください。<br>
 windows: msi<br>
 linux(debian系列): deb <br>
@@ -28,7 +29,7 @@ Fキーなどの便利機能や他の機能などは搭載していません。�
 - 本家のwasdと動きが逆
 - 色相の回り方が角度の増え方と逆
 - fキーの実装
-- tauriを使ってはいるが、大半がwebなので、github pagesで公開できるはず
+- リセット方法がない
 
 ## License
 Mit Licenseです。アイコンなどがデフォルトのままですから...
