@@ -10,7 +10,7 @@ windows: msi<br>
 linux(debian系列): deb <br>
 linux: AppImage<br>
 mac: dmg<br>
-※私はwindowユーザーなので、実際に他のOSで正常に動作するかは知りません
+※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません
 
 ## 使い方
 画像をクリックまたは長押しで右のSphereに色が付きます。<br>
