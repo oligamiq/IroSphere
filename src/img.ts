@@ -75,16 +75,20 @@ export function open_file_dialog_web(load_img: any) {
     input.accept = 'image/*';
     input.onchange = event => {
         const file = (event!.target! as HTMLInputElement)!.files![0];
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = (e) => {
-            const filepath_impl = e.target!.result!;
-            if (typeof (filepath_impl) == 'string') {
-                const filepath = filepath_impl
-                img_load(filepath)
-                get_img_src_size(filepath, load_img)
-            }
-        };
+        read_file_and_load_img(file, load_img)
     };
     input.click();
+}
+
+export function read_file_and_load_img(file: File, load_img: any) {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (e) => {
+        const filepath_impl = e.target!.result!;
+        if (typeof (filepath_impl) == 'string') {
+            const filepath = filepath_impl
+            img_load(filepath)
+            get_img_src_size(filepath, load_img)
+        }
+    };
 }

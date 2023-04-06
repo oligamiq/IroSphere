@@ -1,5 +1,5 @@
 // web
-import { open_file_dialog_web } from "./img";
+import { open_file_dialog_web, read_file_and_load_img } from "./img";
 // web end
 
 // tauri
@@ -31,7 +31,19 @@ export function open_file_dialog(load_img: any) {
 }
 
 export function onFileDropEvent(load_img: any) {
-    if (load_img) { } // web
+    // web
+    window.ondrop = ((ev) => {
+        ev.preventDefault();
+        let types = ev.dataTransfer?.types
+        let isFiles = false
+        if (types?.filter(_ => "Files").length)
+            isFiles = types?.filter(_ => "Files").length > 0
+        if (isFiles) {
+            let file = ev.dataTransfer!.files[0];
+            read_file_and_load_img(file, load_img)
+        }
+    })
+    // web end
     // tauri
     // appWindow.onFileDropEvent((ev) => {
     //     if (ev.payload.type === 'hover') {
