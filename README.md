@@ -2,7 +2,7 @@
 
 これは[Tali](https://github.com/TaliPhoto)さんが、[youtube](https://youtu.be/jrCr4j_qdPo)で紹介した、アイデアまで含めてCC0のソフトであるIroSphereというソフトをtauriというフレームワークで一から書き直したものです。<br>
 [本家](https://github.com/TaliPhoto/IroSphere)
-機能の要望やバグなどはissueなどにお願いします。
+機能の要望などはissueなどにお願いします。
 
 ## install方法
 このgithubのページの右の方にある[Release](https://github.com/oligami-0424/IroSphere/releases/latest)から、それぞれのプラットフォームにあったinstallerをダウンロードし、実行してください。<br>
@@ -12,15 +12,12 @@ linux(debian系列): deb <br>
 linux: AppImage<br>
 mac: dmg<br>
 ※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません<br>
-※linuxではrustがsnake caseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください
+※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください
 
 ## 使い方
 画像をクリックまたは長押しで右のSphereに色が付きます。<br>
 Ctrl+O Alt+Oもしくはドラッグアンドドロップで画像ファイルを読み込みます。<br>
 Fキーなどの便利機能や他の機能などは搭載していません。誰かプルリクを出してもいいですよ
-
-## バグ
-- なぜか本番環境では[この画像](https://github.com/oligami-0424/IroSphere/blob/main/src/assets/ColorBar.png)が読み込まれない（少なくともwindows）
 
 ## 重要
 - アイコンがデフォルトなので早く変更する！！<br>
