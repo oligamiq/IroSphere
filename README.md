@@ -12,7 +12,8 @@ linux(debian系列): deb <br>
 linux: AppImage<br>
 mac: dmg<br>
 ※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません<br>
-※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください
+※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください<br>
+実際のサイズは6.6MB程です！　手軽にどうぞ！　（Windows）
 
 ## 使い方
 画像をクリックまたは長押しで右のSphereに色が付きます。<br>
