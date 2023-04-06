@@ -4,7 +4,7 @@
 [本家](https://github.com/TaliPhoto/IroSphere)
 
 ## install方法
-このgithubのページの右の方にある[Release](https://github.com/oligami-0424/IroSphere/releases)から、それぞれのプラットフォームにあったinstallerをダウンロードし、実行してください。
+このgithubのページの右の方にある[Release](https://github.com/oligami-0424/IroSphere/releases/latest)から、それぞれのプラットフォームにあったinstallerをダウンロードし、実行してください。
 windows: msi
 linux(debian系列): deb 
 linux: AppImage
