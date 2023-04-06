@@ -1,4 +1,3 @@
-// import { invoke } from '@tauri-apps/api'
 import './style.css'
 import { threeviewer } from './3dviewer'
 import { img_load_init } from './img'
