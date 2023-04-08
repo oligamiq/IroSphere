@@ -33,7 +33,7 @@ export function img_load_init(reset_img_callback: any) {
         if (e.ctrlKey || e.altKey) {
             if (e.key == 'o') {
                 e.stopImmediatePropagation()
-                open_file_dialog(load_img)
+                open_file_dialog(load_img, reset_img_callback)
             }
         }
     }, false);
