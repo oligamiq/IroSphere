@@ -22,12 +22,12 @@ export function registerShortcut() {
     // tauri end
 }
 
-export function open_file_dialog(load_img: any) {
+export function open_file_dialog(load_img: any, reset_img_callback: any) {
     // tauri
-    if (load_img)
+    if (load_img && reset_img_callback)
         invoke('open_file_dialog', {})
     // tauri end
-    // open_file_dialog_web(load_img) // web
+    // open_file_dialog_web(load_img, reset_img_callback) // web
 }
 
 export function onFileDropEvent(load_img: any, reset_img_callback: any) {
@@ -48,7 +48,7 @@ export function onFileDropEvent(load_img: any, reset_img_callback: any) {
     //     e.preventDefault();
     //     e.stopPropagation();
     //     let file = e.dataTransfer!.files[0];
-    //     read_file_and_load_img(file, load_img)
+    //     read_file_and_load_img(file, load_img, reset_img_callback)
     // })
     // web end
     // tauri
@@ -66,7 +66,7 @@ export function onFileDropEvent(load_img: any, reset_img_callback: any) {
 }
 
 export async function listen_img_load(load_img: any, reset_img_callback: any) {
-    // if (load_img) { } // web
+    // if (load_img && reset_img_callback) { } // web
     // tauri
     await listen('img_load', event => {
         const msg: string = ((ev: any) => ev.payload.message)(event)
