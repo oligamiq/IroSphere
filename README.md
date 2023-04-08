@@ -1,7 +1,7 @@
 # IroSphere
 
 これは[Tali](https://github.com/TaliPhoto)さんが、[youtube](https://youtu.be/jrCr4j_qdPo)で紹介した、アイデアまで含めてCC0のソフトであるIroSphereというソフトをtauriというフレームワークで一から書き直したものです。<br>
-[本家](https://github.com/TaliPhoto/IroSphere)
+[本家](https://github.com/TaliPhoto/IroSphere)<br>
 機能の要望などはissueなどにお願いします。
 
 ## install方法
@@ -12,7 +12,8 @@ linux(debian系列): deb <br>
 linux: AppImage<br>
 mac: dmg<br>
 ※私はwindowユーザーなので、web版以外は実際に他のOSで正常に動作するかは知りません<br>
-※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください
+※linuxではrustがlowercaseな都合上アプリ名がiro-sphereとなっているようなので気を付けてください<br>
+実際のサイズは6.6MB程です！　手軽にどうぞ！　（Windows）
 
 ## 使い方
 画像をクリックまたは長押しで右のSphereに色が付きます。<br>
@@ -33,6 +34,7 @@ Fキーなどの便利機能や他の機能などは搭載していません。�
 - fキーの実装
 - リセット方法がない
 - スマホ用に縦長モードを搭載
+- ショトカ以外でファイルを開く方法を考える
 
 ## License
 Mit Licenseです。アイコンなどがデフォルトのままですから...
