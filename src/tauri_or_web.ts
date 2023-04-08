@@ -30,7 +30,7 @@ export function open_file_dialog(load_img: any) {
     // open_file_dialog_web(load_img) // web
 }
 
-export function onFileDropEvent(load_img: any) {
+export function onFileDropEvent(load_img: any, reset_img_callback: any) {
     // web
     // const isValid = (e: any) => e.dataTransfer.types.indexOf("Files") >= 0;
     // document.body.addEventListener('dragover', (e) => {
@@ -59,20 +59,20 @@ export function onFileDropEvent(load_img: any) {
             console.log('User dropped', ev.payload.paths);
             const [filepath] = ev.payload.paths// as string[]
             img_load(convertFileSrc(filepath))
-            get_img_src_size(convertFileSrc(filepath), load_img)
+            get_img_src_size(convertFileSrc(filepath), load_img, reset_img_callback)
         }
     })
     // tauri end
 }
 
-export async function listen_img_load(load_img: any) {
+export async function listen_img_load(load_img: any, reset_img_callback: any) {
     // if (load_img) { } // web
     // tauri
     await listen('img_load', event => {
         const msg: string = ((ev: any) => ev.payload.message)(event)
         if (msg) {
             img_load(convertFileSrc(msg))
-            get_img_src_size(convertFileSrc(msg), load_img)
+            get_img_src_size(convertFileSrc(msg), load_img, reset_img_callback)
         }
     })
     // tauri end

@@ -15,6 +15,7 @@ document.querySelector<HTMLDivElement>('#app')!.innerHTML = `
 window.addEventListener("DOMContentLoaded", () => {
 });
 
-img_load_init()
+const reset_img_callback = threeviewer(document.getElementById("threeCanvas"), { initNodeNumS: 7, initNodeNumL: 28, initNodeNumH: 15 })
 
-threeviewer(document.getElementById("threeCanvas"), { initNodeNumS: 7, initNodeNumL: 28, initNodeNumH: 15 })
+img_load_init(reset_img_callback)
+

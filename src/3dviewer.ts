@@ -5,7 +5,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 // https://white-sesame.jp/archives/blog/3062
 
 export function threeviewer(threecanvas: any, param: { initNodeNumS: number, initNodeNumL: number, initNodeNumH: number }) {
-    let unlisten_resize: any;
+    // let unlisten_resize: any;
 
     const scene = new THREE.Scene();
     scene.background = new THREE.Color(0xd0d0d0);
@@ -17,7 +17,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
     camera.lookAt(0, 0, 0); // 注視点の座標
     const controls = new OrbitControls(camera, threecanvas)
     controls.enableDamping = true;
-    controls.dampingFactor = 0.2;;
+    controls.dampingFactor = 0.2;
 
     let renderer: any
     if (threecanvas)
@@ -31,11 +31,15 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
 
     const group = new THREE.Group();
 
-    var additiveNodesNum = 0
     var additiveNodesBeforePos: { x: number, y: number }
-    let additiveNodes: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>[] = []
-    const AdditiveNodesGroup = new THREE.Group();
-    group.add(AdditiveNodesGroup)
+    let additiveNodes: { opecode: string, data: any }[] = []
+    let beforeAdditiveNodes: { opecode: string, data: any }[] = []
+    var continuityKeyAction_Ctrl_z: boolean = true;
+    var continuityKeyAction_Ctrl_z_is_start: boolean = true;
+    var continuityKeyAction_Ctrl_y: boolean = true;
+    var continuityKeyAction_Ctrl_y_is_start: boolean = true;
+    const additiveNodesGroup = new THREE.Group();
+    group.add(additiveNodesGroup)
 
     var group_sphere: any = [];
     scene.add(group)
@@ -77,6 +81,105 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         group.add(mesh)
     }
 
+    const allAddictiveNodeDelete = () => {
+        const additiveNodesAll = additiveNodes.filter(v => (v.opecode == 'add_one')).map(v => {
+            additiveNodesGroup.remove(v.data)
+            return v.data
+        })
+        additiveNodes.push({ opecode: 'remove_all', data: additiveNodesAll })
+        beforeAdditiveNodes.length = 0
+    }
+
+    const allAddictiveNodeDeleteImgChange = () => {
+        const additiveNodesAll = additiveNodes.filter(v => (v.opecode == 'add_one')).map(v => {
+            additiveNodesGroup.remove(v.data)
+            return v.data
+        })
+        additiveNodes.push({ opecode: 'remove_all_img_change', data: additiveNodesAll })
+        beforeAdditiveNodes.length = 0
+    }
+
+    document.addEventListener('keyup', event => {
+        if (event.altKey || event.ctrlKey) {
+            if (event.key == 'r' || event.key == 'd') {
+                allAddictiveNodeDelete()
+            }
+            if (event.key == 'z') {
+                continuityKeyAction_Ctrl_z = true
+                continuityKeyAction_Ctrl_z_is_start = true
+            }
+            if (event.key == 'y') {
+                continuityKeyAction_Ctrl_y = true
+                continuityKeyAction_Ctrl_y_is_start = true
+            }
+        }
+    })
+    document.addEventListener('keydown', event => {
+        if (event.altKey || event.ctrlKey) {
+            if (event.key == 'z') {
+                if (continuityKeyAction_Ctrl_z) {
+                    const lastAdditiveNodes = additiveNodes.pop()
+                    var cancel_node: boolean = false
+                    if (lastAdditiveNodes) {
+                        if (lastAdditiveNodes.opecode == 'add_one')
+                            additiveNodesGroup.remove(lastAdditiveNodes.data)
+                        if (lastAdditiveNodes.opecode == 'remove_all')
+                            lastAdditiveNodes.data.forEach((v: any) => {
+                                additiveNodesGroup.add(v)
+                            })
+                        if (lastAdditiveNodes.opecode == 'remove_all_img_change') {
+                            if (continuityKeyAction_Ctrl_z_is_start)
+                                lastAdditiveNodes.data.forEach((v: any) => {
+                                    additiveNodesGroup.add(v)
+                                })
+                            else {
+                                continuityKeyAction_Ctrl_z = false
+                                cancel_node = true
+                            }
+                        }
+                        if (cancel_node)
+                            additiveNodes.push(lastAdditiveNodes)
+                        else {
+                            beforeAdditiveNodes.push(lastAdditiveNodes)
+                            continuityKeyAction_Ctrl_z_is_start = false;
+                        }
+                    }
+                }
+            }
+            if (event.key == 'y') {
+                if (continuityKeyAction_Ctrl_y) {
+                    const lastAdditiveNodes = beforeAdditiveNodes.pop()
+                    var cancel_node: boolean = false
+                    if (lastAdditiveNodes) {
+                        if (lastAdditiveNodes.opecode == 'add_one') {
+                            additiveNodesGroup.add(lastAdditiveNodes.data)
+                        }
+                        if (lastAdditiveNodes.opecode == 'remove_all')
+                            lastAdditiveNodes.data.forEach((v: any) => {
+                                additiveNodesGroup.remove(v)
+                            });
+                        if (lastAdditiveNodes.opecode == 'remove_all_img_change') {
+                            if (continuityKeyAction_Ctrl_y_is_start)
+                                lastAdditiveNodes.data.forEach((v: any) => {
+                                    additiveNodesGroup.remove(v)
+                                });
+                            else {
+                                continuityKeyAction_Ctrl_y = false
+                                cancel_node = true
+                            }
+                        }
+                        if (cancel_node)
+                            beforeAdditiveNodes.push(lastAdditiveNodes)
+                        else {
+                            additiveNodes.push(lastAdditiveNodes)
+                            continuityKeyAction_Ctrl_y_is_start = false;
+                        }
+                    }
+                }
+            }
+        }
+    }, false); // 第一引数にkeyupを記述
+
     for (var k = 0; k < param.initNodeNumL; ++k) {
         const elevation = param.initNodeNumL == 1 ? 0.0 : Math.PI * 2 / param.initNodeNumL * k;
         for (var j = 1; j <= param.initNodeNumS; ++j) {
@@ -90,7 +193,6 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         }
     }
 
-
     const colorSphereMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.5 });
     const colorSphereGeometry = new THREE.SphereGeometry(0.1); // サイズ, 分割数
     const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
@@ -101,7 +203,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         group.rotation.x += 0.4;
         group.rotation.y += 0.4;
 
-        unlisten_resize = await window.addEventListener('resize', () => {
+        /* unlisten_resize = */await window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth / 2, window.innerHeight)
             const aspect_camera = aspectCamera([window.innerWidth / 2, window.innerHeight]);
             camera.left = -aspect_camera[0]
@@ -130,10 +232,10 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
             const colorSphereMesh = new THREE.Mesh(colorSphereGeometry, colorSphereMaterial);
             colorSphereMesh.position.set(pos.x, pos.y, pos.z)
 
-            additiveNodes.push(colorSphereMesh)
-            AdditiveNodesGroup.add(additiveNodes[additiveNodesNum])
+            additiveNodes.push({ opecode: 'add_one', data: colorSphereMesh })
+            beforeAdditiveNodes.length = 0
+            additiveNodesGroup.add(colorSphereMesh)
             additiveNodesBeforePos = { x: image_position[0], y: image_position[1] }
-            ++additiveNodesNum
         }
 
         window.addEventListener("mousemove", e => {
@@ -185,14 +287,16 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         let key_down: { w: boolean, a: boolean, s: boolean, d: boolean };
         key_down = { w: false, a: false, s: false, d: false }
         const key_func = function (event: KeyboardEvent, press: boolean) {
-            if (event.key == "w")
-                key_down.w = press
-            if (event.key == "a")
-                key_down.a = press
-            if (event.key == "s")
-                key_down.s = press
-            if (event.key == "d")
-                key_down.d = press
+            if (!event.ctrlKey && !event.altKey) {
+                if (event.key == "w")
+                    key_down.w = press
+                if (event.key == "a")
+                    key_down.a = press
+                if (event.key == "s")
+                    key_down.s = press
+                if (event.key == "d")
+                    key_down.d = press
+            }
         }
         document.addEventListener('keydown', e => key_func(e, true), false); // 第一引数にkeydownを記述
         document.addEventListener('keyup', e => key_func(e, false), false); // 第一引数にkeyupを記述
@@ -220,10 +324,11 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         animate();
     })()
 
-    return () => {
-        if (unlisten_resize)
-            unlisten_resize();
-    }
+    // return () => {
+    //     if (unlisten_resize)
+    //         unlisten_resize();
+    // }
+    return allAddictiveNodeDeleteImgChange;
 }
 
 function aspectCamera(size: [number, number]): [number, number] {

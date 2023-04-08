@@ -1,23 +1,23 @@
-$color_1: rgba(255, 255, 255, 0.87);
-$color_2: #d0d0d0;
-$font-family_1: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-$font-family_2: inherit;
-$background-color_1: #d0d0d0;
-$background-color_2: #ffffff;
-$background-color_3: #f9f9f9;
+$background-color_dark: #d0d0d0;
+$background-color_light: #d0d0d0;
+$color: contrast-color($background-color_dark);
+$font-family_default: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+$font-family_btn: inherit;
 
 @page :root {
-    font-family: $font-family_1;
+    font-family: $font-family_default;
     line-height: 1.5;
     font-weight: 400;
     color-scheme: light dark;
-    color: $color_1;
-    background-color: $background-color_1;
+    color: $color;
+    background-color: $background-color_dark;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
+
+    /* ビヨヨン効果を無効化する 及び スクロール削除 */
     overscroll-behavior: none;
     overflow: clip;
     overflow-wrap: unset;
@@ -29,6 +29,7 @@ $background-color_3: #f9f9f9;
     margin: 0 auto;
     padding: 0rem;
     text-align: center;
+
 }
 
 input {
@@ -37,8 +38,8 @@ input {
     padding: 0.6em 1.2em;
     font-size: 1em;
     font-weight: 500;
-    font-family: $font-family_2;
-    background-color: $background-color_1;
+    font-family: $font-family_btn;
+    background-color: $background-color_dark;
     transition: border-color 0.25s;
 }
 
@@ -48,8 +49,8 @@ button {
     padding: 0.6em 1.2em;
     font-size: 1em;
     font-weight: 500;
-    font-family: $font-family_2;
-    background-color: $background-color_1;
+    font-family: $font-family_btn;
+    background-color: $background-color_dark;
     transition: border-color 0.25s;
 }
 
@@ -64,7 +65,7 @@ button {
     max-height: 100%;
     margin-top: auto;
     margin-bottom: auto;
-    background-color: $background-color_1;
+    background-color: $background-color_dark;
 }
 
 #file_img {
@@ -77,16 +78,23 @@ body {
     margin: 0;
     display: flex;
     place-items: center;
-    background-color: $background-color_1;
+    background-color: $background-color_dark;
+
+    /* ビヨヨン効果を無効化する 及び スクロール削除 */
+    overscroll-behavior: none;
+    overflow: clip;
+    overflow-wrap: unset;
+    overflow-inline: hidden;
+    padding-top: 0;
 }
 
 @media (prefers-color-scheme: light) {
     @page :root {
-        color: $color_2;
-        background-color: $background-color_2;
+        color: $color;
+        background-color: $background-color_dark;
     }
 
     button {
-        background-color: $background-color_3;
+        background-color: $background-color_dark;
     }
 }
