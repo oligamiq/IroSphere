@@ -3,19 +3,25 @@
 #include <fstream>
 #include <iostream>
 #include <string>
-
+#include <vector>
 using namespace std;    // 汚染がひどいのであまりやってはいけない
+
+namespace fs = std::filesystem;
 
 string getImplStr(string str);
 int    change_file(string file_name, string sign);
-int    main(int argc, char* argv[]) {
+int    file_copy_write(string fromPath, string toPath);
+
+int main(int argc, char* argv[]) {
   if (argc != 3) {
     cerr << "must be two args" << endl;
     return 1;
   }
-  for (const filesystem::directory_entry& i : filesystem::recursive_directory_iterator(".")) {
-    const string file_name = i.path( ).filename( ).string( );
-    change_file(file_name, "tauri");
+  vector<string> path_arr;
+  for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1]))
+    path_arr.push_back(i.path( ).string( ));
+  for (string item : path_arr) {
+    change_file(item, argv[2]);
   }
 }
 
@@ -26,9 +32,10 @@ int change_file(string file_name, string sign) {
     // cout << "Error opening files!" << endl;
     return 1;
   } else {
-    string   tmp_file_name = file_name + ".tmp";
+    string tmp_file_name = file_name + ".tmp";
+
     ofstream fileout(tmp_file_name);    //Temporary file
-    if (!fileout.is_open( )) {
+    if (fileout.is_open( )) {
       while (getline(filein, line)) {
         string line_impl = getImplStr(line);
         line             = line_impl;
@@ -39,16 +46,38 @@ int change_file(string file_name, string sign) {
         fileout << line;
         //if(found) break;
       }
-      if (!filesystem::copy_file(tmp_file_name, file_name, filesystem::copy_options::update_existing)) {
-        cerr << "cannot copy" << endl;
-      }
-      if (!filesystem::remove(tmp_file_name)) {
-        cerr << "cannot remove" << endl;
-      }
       filein.close( );
       fileout.close( );
+      file_copy_write(tmp_file_name, file_name);
+      fs::remove(tmp_file_name);
     }
   }
+  return 0;
+}
+
+int file_copy_write(string fromPath, string toPath) {
+  std::ifstream fromFile(fromPath, std::ios::binary);
+  if (!fromFile.is_open( )) {
+    std::cerr << "Failed to open the original file.\n";
+    return 1;
+  }
+  std::ofstream toFile(toPath, std::ios::binary | std::ios::trunc);
+  if (!toFile.is_open( )) {
+    std::cerr << "Failed to create the copy file.\n";
+    return 1;
+  }
+  const auto        fileSize   = fs::file_size(fromPath);
+  const std::size_t bufferSize = 4096;
+  char              buffer[bufferSize];
+  std::size_t       remainingBytes = fileSize;
+  while (remainingBytes > 0) {
+    const std::size_t readBytes = std::min(bufferSize, remainingBytes);
+    fromFile.read(buffer, readBytes);
+    toFile.write(buffer, readBytes);
+    remainingBytes -= readBytes;
+  }
+  fromFile.close( );
+  toFile.close( );
   return 0;
 }
 
