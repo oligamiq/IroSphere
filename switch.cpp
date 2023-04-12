@@ -12,10 +12,10 @@ namespace fs = std::filesystem;
 string            getImplStr(string str);
 int               change_file(string file_name, string sign, bool commentOut);
 int               file_copy_write(string fromPath, string toPath);
-pair<int, string> count_leading_whitespace(const std::string& str);
+pair<int, string> count_leading_whitespace(const string& str);
 
 int main(int argc, char* argv[]) {
-  const std::vector<std::string> out_extensions = { ".ts", ".scss" };
+  const vector<string> out_extensions = { ".ts", ".scss" };
   if (argc != 4) {
     cerr << "./switch.exe <dir> <tauri | web> <on | off>" << endl;
     return 1;
@@ -26,7 +26,7 @@ int main(int argc, char* argv[]) {
     const string ext  = i.path( ).extension( ).string( );
     if (i.is_regular_file( ))
       // if (is_text(path))
-      if (std::count(begin(out_extensions), end(out_extensions), ext) > 0)
+      if (count(begin(out_extensions), end(out_extensions), ext) > 0)
         path_arr.push_back(path);
   }
   const bool commentOut = (!strcmp(argv[3], "on")) ? true : false;
@@ -78,22 +78,22 @@ int change_file(string file_name, string sign, bool commentOut) {
 }
 
 int file_copy_write(string fromPath, string toPath) {
-  std::ifstream fromFile(fromPath, std::ios::binary);
+  ifstream fromFile(fromPath, ios::binary);
   if (!fromFile.is_open( )) {
     cerr << "Failed to open the original file.\n";
     return 1;
   }
-  std::ofstream toFile(toPath, std::ios::binary | std::ios::trunc);
+  ofstream toFile(toPath, ios::binary | ios::trunc);
   if (!toFile.is_open( )) {
     cerr << "Failed to create the copy file.\n";
     return 1;
   }
-  const auto        fileSize   = fs::file_size(fromPath);
-  const std::size_t bufferSize = 4096;
-  char              buffer[bufferSize];
-  std::size_t       remainingBytes = fileSize;
+  const auto   fileSize   = fs::file_size(fromPath);
+  const size_t bufferSize = 4096;
+  char         buffer[bufferSize];
+  size_t       remainingBytes = fileSize;
   while (remainingBytes > 0) {
-    const std::size_t readBytes = std::min(bufferSize, remainingBytes);
+    const size_t readBytes = min(bufferSize, remainingBytes);
     fromFile.read(buffer, readBytes);
     toFile.write(buffer, readBytes);
     remainingBytes -= readBytes;
@@ -109,7 +109,7 @@ bool isBothSpace(const char& lhs, const char& rhs) {
 
 string getImplStr(string str) {
   if (!str.empty( )) {
-    auto it = std::unique(str.begin( ), str.end( ), isBothSpace);
+    auto it = unique(str.begin( ), str.end( ), isBothSpace);
     str.erase(it, str.end( ));
     if (str[0] == ' ')
       str.erase(str.begin( ));
@@ -119,7 +119,7 @@ string getImplStr(string str) {
   return str;
 }
 
-pair<int, string> count_leading_whitespace(const std::string& str) {
+pair<int, string> count_leading_whitespace(const string& str) {
   int count = 0;
   for (const char& c : str)
     if (c == ' ')
