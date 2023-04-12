@@ -27,28 +27,32 @@ export function open_file_dialog(load_img: any, reset_img_callback: any) {
   if (load_img && reset_img_callback)
     invoke('open_file_dialog', {})
   // tauri end
-  // open_file_dialog_web(load_img, reset_img_callback) // web
+  // web
+  // open_file_dialog_web(load_img, reset_img_callback)
+  // web end
 }
 
 export function onFileDropEvent(load_img: any, reset_img_callback: any) {
   // web
   // const isValid = (e: any) => e.dataTransfer.types.indexOf("Files") >= 0;
   // document.body.addEventListener('dragover', (e) => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
-  //     if (e.dataTransfer) {
-  //         if (isValid(e)) {
-  //             e.dataTransfer.dropEffect = "none"; return;
-  //         }
-  //         e.dataTransfer.dropEffect = "copy";
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   if (e.dataTransfer) {
+  //     if (isValid(e)) {
+  //       e.dataTransfer.dropEffect = "none"; return;
   //     }
+  //     e.dataTransfer.dropEffect = "copy";
+  //   }
   // })
   // document.body.addEventListener('dragleave', (e) => e.stopPropagation())
   // document.body.addEventListener('drop', (e) => {
-  //     e.preventDefault();
-  //     e.stopPropagation();
+  //   e.preventDefault();
+  //   e.stopPropagation();
+  //   if (e.dataTransfer) {
   //     let file = e.dataTransfer.files[0];
-  //     read_file_and_load_img(file, load_img, reset_img_callback)
+  //     read_file_and_load_img(file, load_img, reset_img_callback);
+  //   }
   // })
   // web end
   // tauri
@@ -66,7 +70,9 @@ export function onFileDropEvent(load_img: any, reset_img_callback: any) {
 }
 
 export async function listen_img_load(load_img: any, reset_img_callback: any) {
-  // if (load_img && reset_img_callback) { } // web
+  // web
+  // if (load_img && reset_img_callback) { }
+  // web end
   // tauri
   await listen('img_load', event => {
     const msg: string = ((ev: any) => ev.payload.message)(event)

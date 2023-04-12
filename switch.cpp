@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cstring>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -9,21 +10,29 @@ using namespace std;    // 汚染がひどいのであまりやってはいけ�
 namespace fs = std::filesystem;
 
 string getImplStr(string str);
-int    change_file(string file_name, string sign);
+int    change_file(string file_name, string sign, bool commentOut);
 int    file_copy_write(string fromPath, string toPath);
+// bool   is_text(const string& filename);
+pair<int, string> count_leading_whitespace(const std::string& str);
 
 int main(int argc, char* argv[]) {
+  const std::vector<std::string> out_extensions = { ".ts", ".scss" };
   if (argc != 4) {
     cerr << "./switch.exe <dir> <tauri | web> <on | off>" << endl;
     return 1;
   }
   vector<string> path_arr;
   for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1])) {
-    path_arr.push_back(i.path( ).string( ));
+    const string path = i.path( ).string( );
+    const string ext  = i.path( ).extension( ).string( );
+    if (i.is_regular_file( ))
+      // if (is_text(path))
+      if (std::count(begin(out_extensions), end(out_extensions), ext) > 0)
+        path_arr.push_back(path);
   }
-  const bool commentOut = (argv[3] == "on") ? true : false;
+  const bool commentOut = (!strcmp(argv[3], "on")) ? true : false;
   for (string item : path_arr) {
-    // change_file(item, argv[2], commentOut);
+    change_file(item, argv[2], commentOut);
     cout << item << endl;
   }
 }
@@ -38,19 +47,27 @@ int change_file(string file_name, string sign, bool commentOut) {
     string   tmp_file_name = file_name + ".tmp";
     ofstream fileout(tmp_file_name);    //Temporary file
     if (fileout.is_open( )) {
-      bool isComment = false;
+      bool              isComment = false;
+      pair<int, string> slashBeforeSpaces;
       while (getline(filein, line)) {
         string line_impl = getImplStr(line);
-        if (line_impl == sign)
-          isComment = true;
-        else if (line_impl == sign + " end")
+        // cout << line_impl << ":" << sign << endl;
+        if (line_impl == "// " + sign) {
+          isComment         = true;
+          slashBeforeSpaces = count_leading_whitespace(line);
+          fileout << line;
+        } else if (line_impl == "// " + sign + " end") {
           isComment = false;
-        else if (isComment)
+          fileout << line;
+        } else if (isComment) {
           if (commentOut)
-            fileout << "// " + line;
-          else { }
-        else
-          fileout << line + "\n";
+            fileout << slashBeforeSpaces.second + line.substr(slashBeforeSpaces.first + 3);
+          else {
+            fileout << slashBeforeSpaces.second + "// " + line.substr(slashBeforeSpaces.first);
+          }
+        } else
+          fileout << line;
+        fileout << "\n";
       }
       filein.close( );
       fileout.close( );
@@ -101,4 +118,27 @@ string getImplStr(string str) {
       str.erase(str.size( ) - 1);
   }
   return str;
+}
+
+// bool is_text(const string& filename) {
+//   std::ifstream file(filename, ios::binary);
+//   if (!file.is_open( )) {
+//     cerr << "Failed to open file: " << filename << std::endl;
+//     return false;
+//   }
+
+//   std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>( ));
+//   return std::all_of(file_contents.begin( ), file_contents.end( ), [](char c) {
+//     return std::isprint(c);
+//   });
+// }
+
+pair<int, string> count_leading_whitespace(const std::string& str) {
+  int count = 0;
+  for (const char& c : str)
+    if (c == ' ')
+      count++;
+    else
+      break;
+  return { count, str.substr(0, count) };
 }
