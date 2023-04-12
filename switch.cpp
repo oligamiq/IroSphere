@@ -13,38 +13,42 @@ int    change_file(string file_name, string sign);
 int    file_copy_write(string fromPath, string toPath);
 
 int main(int argc, char* argv[]) {
-  if (argc != 3) {
-    cerr << "must be two args" << endl;
+  if (argc != 4) {
+    cerr << "./switch.exe <dir> <tauri | web> <on | off>" << endl;
     return 1;
   }
   vector<string> path_arr;
   for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1]))
     path_arr.push_back(i.path( ).string( ));
+  const bool commentOut = (argv[3] == "on") ? true : false;
   for (string item : path_arr) {
-    change_file(item, argv[2]);
+    change_file(item, argv[2], commentOut);
   }
 }
 
-int change_file(string file_name, string sign) {
+int change_file(string file_name, string sign, bool commentOut) {
   string   line;
   ifstream filein(file_name);    //File to read from
   if (!filein.is_open( )) {
-    // cout << "Error opening files!" << endl;
+    cout << "Error opening files!" << endl;
     return 1;
   } else {
-    string tmp_file_name = file_name + ".tmp";
-
+    string   tmp_file_name = file_name + ".tmp";
     ofstream fileout(tmp_file_name);    //Temporary file
     if (fileout.is_open( )) {
+      bool isComment = false;
       while (getline(filein, line)) {
         string line_impl = getImplStr(line);
-        line             = line_impl;
-        if (line_impl == sign) {
-          //found = true;
-        }
-        line += "\n";
-        fileout << line;
-        //if(found) break;
+        if (line_impl == sign)
+          isComment = true;
+        else if (line_impl == sign + " end")
+          isComment = false;
+        else if (isComment)
+          if (commentOut)
+            fileout << "// " + line;
+          else { }
+        else
+          fileout << line + "\n";
       }
       filein.close( );
       fileout.close( );
