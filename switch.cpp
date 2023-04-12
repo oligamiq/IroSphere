@@ -80,12 +80,12 @@ int change_file(string file_name, string sign, bool commentOut) {
 int file_copy_write(string fromPath, string toPath) {
   std::ifstream fromFile(fromPath, std::ios::binary);
   if (!fromFile.is_open( )) {
-    std::cerr << "Failed to open the original file.\n";
+    cerr << "Failed to open the original file.\n";
     return 1;
   }
   std::ofstream toFile(toPath, std::ios::binary | std::ios::trunc);
   if (!toFile.is_open( )) {
-    std::cerr << "Failed to create the copy file.\n";
+    cerr << "Failed to create the copy file.\n";
     return 1;
   }
   const auto        fileSize   = fs::file_size(fromPath);
