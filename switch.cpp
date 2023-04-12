@@ -9,10 +9,9 @@ using namespace std;    // 汚染がひどいのであまりやってはいけ�
 
 namespace fs = std::filesystem;
 
-string getImplStr(string str);
-int    change_file(string file_name, string sign, bool commentOut);
-int    file_copy_write(string fromPath, string toPath);
-// bool   is_text(const string& filename);
+string            getImplStr(string str);
+int               change_file(string file_name, string sign, bool commentOut);
+int               file_copy_write(string fromPath, string toPath);
 pair<int, string> count_leading_whitespace(const std::string& str);
 
 int main(int argc, char* argv[]) {
@@ -119,19 +118,6 @@ string getImplStr(string str) {
   }
   return str;
 }
-
-// bool is_text(const string& filename) {
-//   std::ifstream file(filename, ios::binary);
-//   if (!file.is_open( )) {
-//     cerr << "Failed to open file: " << filename << std::endl;
-//     return false;
-//   }
-
-//   std::string file_contents((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>( ));
-//   return std::all_of(file_contents.begin( ), file_contents.end( ), [](char c) {
-//     return std::isprint(c);
-//   });
-// }
 
 pair<int, string> count_leading_whitespace(const std::string& str) {
   int count = 0;
