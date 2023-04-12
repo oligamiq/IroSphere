@@ -18,11 +18,13 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   vector<string> path_arr;
-  for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1]))
+  for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1])) {
     path_arr.push_back(i.path( ).string( ));
+  }
   const bool commentOut = (argv[3] == "on") ? true : false;
   for (string item : path_arr) {
-    change_file(item, argv[2], commentOut);
+    // change_file(item, argv[2], commentOut);
+    cout << item << endl;
   }
 }
 
