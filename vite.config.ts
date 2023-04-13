@@ -1,4 +1,8 @@
 import { defineConfig } from 'vite'
+// chrome_extension
+// import { crx } from '@crxjs/vite-plugin'
+// import manifest from './manifest.json'
+// chrome_extension end
 
 export default defineConfig({
     // prevent vite from obscuring rust errors

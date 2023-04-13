@@ -1,3 +1,5 @@
+// g++ switch.cpp -O3 -o switch.exe --std=c++2a
+
 #include <algorithm>
 #include <cstring>
 #include <filesystem>
@@ -21,18 +23,29 @@ int main(int argc, char* argv[]) {
     return 1;
   }
   vector<string> path_arr;
-  for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1])) {
-    const string path = i.path( ).string( );
-    const string ext  = i.path( ).extension( ).string( );
-    if (i.is_regular_file( ))
-      // if (is_text(path))
-      if (count(begin(out_extensions), end(out_extensions), ext) > 0)
-        path_arr.push_back(path);
-  }
-  const bool commentOut = (!strcmp(argv[3], "on")) ? true : false;
-  for (string item : path_arr) {
-    change_file(item, argv[2], commentOut);
-    cout << item << endl;
+  fs::path       path_to_check(argv[1]);
+  if (fs::exists(path_to_check)) {
+    const bool commentOut = (!strcmp(argv[3], "on")) ? true : false;
+    if (fs::is_regular_file(path_to_check)) {
+      change_file(argv[1], argv[2], commentOut);
+      // std::cout << "Regular file" << std::endl;
+    } else if (fs::is_directory(path_to_check)) {
+      for (const fs::directory_entry& i : fs::recursive_directory_iterator(argv[1])) {
+        const string path = i.path( ).string( );
+        const string ext  = i.path( ).extension( ).string( );
+        if (i.is_regular_file( ))
+          // if (is_text(path))
+          if (count(begin(out_extensions), end(out_extensions), ext) > 0)
+            path_arr.push_back(path);
+      }
+      for (string item : path_arr) {
+        change_file(item, argv[2], commentOut);
+        // cout << item << endl;
+      }
+      // std::cout << "Directory" << std::endl;
+    } else {
+      std::cout << "Unknown file type" << std::endl;
+    }
   }
 }
 
@@ -46,24 +59,45 @@ int change_file(string file_name, string sign, bool commentOut) {
     string   tmp_file_name = file_name + ".tmp";
     ofstream fileout(tmp_file_name);    //Temporary file
     if (fileout.is_open( )) {
-      bool              isComment = false;
+      bool              isComment      = false;
+      bool              isCommentStart = false;
+      int               isCommentExist = 0;
       pair<int, string> slashBeforeSpaces;
       while (getline(filein, line)) {
         string line_impl = getImplStr(line);
         // cout << line_impl << ":" << sign << endl;
         if (line_impl == "// " + sign) {
-          isComment         = true;
+          isComment      = true;
+          isCommentStart = true;
+          isCommentExist++;
           slashBeforeSpaces = count_leading_whitespace(line);
           fileout << line;
         } else if (line_impl == "// " + sign + " end") {
-          isComment = false;
+          isComment      = false;
+          isCommentStart = false;
           fileout << line;
         } else if (isComment) {
-          if (commentOut)
-            fileout << slashBeforeSpaces.second + line.substr(slashBeforeSpaces.first + 3);
-          else {
-            fileout << slashBeforeSpaces.second + "// " + line.substr(slashBeforeSpaces.first);
+          if (isCommentStart) {
+            if (commentOut) {
+              if (line_impl.substr(0, 2) != "//") {
+                isComment = false;
+                isCommentExist--;
+              }
+            } else {
+              if (line_impl.substr(0, 2) == "//") {
+                isComment = false;
+                isCommentExist--;
+              }
+            }
+            isCommentStart = false;
           }
+          if (isComment)
+            if (commentOut)
+              fileout << slashBeforeSpaces.second + line.substr(slashBeforeSpaces.first + 3);
+            else
+              fileout << slashBeforeSpaces.second + "// " + line.substr(slashBeforeSpaces.first);
+          else
+            fileout << line;
         } else
           fileout << line;
         fileout << "\n";
@@ -72,6 +106,8 @@ int change_file(string file_name, string sign, bool commentOut) {
       fileout.close( );
       file_copy_write(tmp_file_name, file_name);
       fs::remove(tmp_file_name);
+      if (isCommentExist > 0)
+        cout << file_name << endl;
     }
   }
   return 0;

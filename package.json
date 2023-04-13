@@ -5,12 +5,18 @@
   "type": "module",
   "scripts": {
     "tauri": "tauri",
+    "preinstall": "npm install",
     "dev": "vite",
-    "build": "tsc && vite build",
-    "githubPages": "switch.exe src tauri off && switch.exe src web on && tsc && vite build --outDir docs --base=\"./\" && switch.exe src tauri on && switch.exe src web off",
+    "change-tauri": "switch.exe src tauri on && switch.exe vite.config.ts chrome_extension off && switch.exe src web off",
+    "change-githubPages": "vite.config.ts chrome_extension off && switch.exe src web on",
+    "change-chrome-extension": "vite.config.ts chrome_extension off && switch.exe src web on",
+    "build": "npm run change-tauri && tsc && vite build",
+    "githubPages": "npm run change-githubPages && tsc && vite build --outDir docs --base=\"./\" && npm run change-tauri",
+    "chrome-extension": "npm run change-chrome-extension && tsc && vite build && npm run change-tauri",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "@crxjs/vite-plugin": "^2.0.0-beta.15",
     "@types/three": "^0.150.1",
     "sass": "^1.61.0",
     "three": "^0.151.2",
