@@ -203,7 +203,7 @@ export function threeviewer(threecanvas: any, param: { initNodeNumS: number, ini
         group.rotation.x += 0.4;
         group.rotation.y += 0.4;
 
-        /* unlisten_resize = */await window.addEventListener('resize', () => {
+    /* unlisten_resize = */await window.addEventListener('resize', () => {
             renderer.setSize(window.innerWidth / 2, window.innerHeight)
             const aspect_camera = aspectCamera([window.innerWidth / 2, window.innerHeight]);
             camera.left = -aspect_camera[0]
