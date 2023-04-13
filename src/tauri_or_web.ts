@@ -14,8 +14,9 @@ import { appWindow } from '@tauri-apps/api/window'
 export function registerShortcut() {
   // tauri
   document.addEventListener('keyup', e => {
-    if (e.key == 'F11')
-      appWindow.isFullscreen().then(isFullScreen => appWindow.setFullscreen(isFullScreen))
+    if (e.key == 'F11') {
+      appWindow.isFullscreen().then(isFullScreen => appWindow.setFullscreen(!isFullScreen))
+    }
     if (e.key == 'Escape')
       appWindow.setFullscreen(false)
   }, false);

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "IroSphere",
+  "version": "1.0.4",
+  "action": {
+    "default_popup": "src/chrome-extension/popup.html"
+  },
+  "background": {
+    "service_worker": "src/chrome-extension/event.ts",
+    "persistent": false
+  },
+  "permissions": [
+    "activeTab",
+    "contextMenus"
+  ],
+  "icons": {
+    "16": "src/assets/icon.png",
+    "48": "src/assets/icon.png",
+    "128": "src/assets/icon.png"
+  }
+}

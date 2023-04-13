@@ -18,4 +18,3 @@ window.addEventListener("DOMContentLoaded", () => {
 const reset_img_callback = threeviewer(document.getElementById("threeCanvas"), { initNodeNumS: 7, initNodeNumL: 28, initNodeNumH: 15 })
 
 img_load_init(reset_img_callback)
-

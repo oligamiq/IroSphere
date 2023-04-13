@@ -1,22 +1,23 @@
 {
   "name": "irosphere",
   "private": true,
-  "version": "1.0.3",
+  "version": "1.0.4",
   "type": "module",
   "scripts": {
     "tauri": "tauri",
-    "preinstall": "npm install",
     "dev": "vite",
-    "change-tauri": "switch.exe src tauri on && switch.exe vite.config.ts chrome_extension off && switch.exe src web off",
-    "change-githubPages": "vite.config.ts chrome_extension off && switch.exe src web on",
-    "change-chrome-extension": "vite.config.ts chrome_extension off && switch.exe src web on",
+    "change-tauri": "switch.exe . tauri on chrome_extension off web off",
+    "change-githubPages": "switch.exe . tauri off chrome_extension off web on",
+    "change-chrome-extension": "switch.exe . tauri off chrome_extension on web on",
     "build": "npm run change-tauri && tsc && vite build",
+    "build_only": "tsc && vite build",
     "githubPages": "npm run change-githubPages && tsc && vite build --outDir docs --base=\"./\" && npm run change-tauri",
     "chrome-extension": "npm run change-chrome-extension && tsc && vite build && npm run change-tauri",
     "preview": "vite preview"
   },
   "devDependencies": {
     "@crxjs/vite-plugin": "^2.0.0-beta.15",
+    "@types/chrome": "^0.0.231",
     "@types/three": "^0.150.1",
     "sass": "^1.61.0",
     "three": "^0.151.2",
